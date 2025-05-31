@@ -1,0 +1,6 @@
+@DiarioDiViaggioApi_HostAddress = http://localhost:5106
+
+GET {{DiarioDiViaggioApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
