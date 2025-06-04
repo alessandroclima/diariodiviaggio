@@ -1,0 +1,60 @@
+<div class="trip-list-container">
+  <div class="header">
+    <h1>I miei viaggi</h1>
+    <button mat-raised-button color="primary" routerLink="/trips/new">
+      <mat-icon>add</mat-icon>
+      Nuovo viaggio
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <div *ngIf="!isLoading && trips.length === 0" class="empty-state">
+    <mat-icon>flight</mat-icon>
+    <h2>Nessun viaggio trovato</h2>
+    <p>Inizia a creare il tuo primo viaggio</p>
+    <button mat-raised-button color="primary" routerLink="/trips/new">
+      <mat-icon>add</mat-icon>
+      Nuovo viaggio
+    </button>
+  </div>
+
+  <div *ngIf="!isLoading && trips.length > 0" class="trips-grid">
+    <mat-card *ngFor="let trip of trips" class="trip-card" [routerLink]="['/trips', trip.id]">
+      <mat-card-header>
+        <mat-card-title>{{ trip.title }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ trip.startDate | date:'dd/MM/yyyy' }} - {{ trip.endDate ? (trip.endDate | date:'dd/MM/yyyy') : 'In corso' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p *ngIf="trip.description">{{ trip.description }}</p>
+        <div class="trip-meta">
+          <div>
+            <mat-icon>person</mat-icon>
+            <span>{{ trip.ownerUsername }}</span>
+          </div>
+          <div *ngIf="trip.sharedWithUsernames.length > 0">
+            <mat-icon>group</mat-icon>
+            <span>Condiviso con {{ trip.sharedWithUsernames.length }} persone</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="join-trip-container">
+    <h2>Unisciti a un viaggio</h2>
+    <div class="join-trip-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Codice di condivisione</mat-label>
+        <input matInput [(ngModel)]="shareCode" placeholder="Inserisci il codice">
+      </mat-form-field>
+      <button mat-raised-button color="primary" [disabled]="!shareCode" (click)="joinTrip()">
+        Unisciti
+      </button>
+    </div>
+  </div>
+</div>

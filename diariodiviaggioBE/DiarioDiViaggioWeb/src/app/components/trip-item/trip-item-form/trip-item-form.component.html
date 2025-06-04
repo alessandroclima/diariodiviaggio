@@ -1,0 +1,81 @@
+<div class="trip-item-form-container">
+  <h2 class="form-title">{{ isEdit ? 'Edit' : 'Add' }} Travel Diary Entry</h2>
+  
+  <form [formGroup]="tripItemForm" (ngSubmit)="onSubmit()" class="trip-item-form">
+    <div class="form-section">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Title</mat-label>
+        <input matInput formControlName="title" placeholder="Give your entry a title">
+        <mat-error *ngIf="tripItemForm.get('title')?.hasError('required')">
+          Title is required
+        </mat-error>
+        <mat-error *ngIf="tripItemForm.get('title')?.hasError('maxlength')">
+          Title cannot exceed 100 characters
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="type">
+          <mat-option *ngFor="let type of tripItemTypes" [value]="type.value">
+            {{type.label}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="tripItemForm.get('type')?.hasError('required')">
+          Type is required
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-section">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" placeholder="Add details about your experience" rows="4"></textarea>
+      </mat-form-field>
+    </div>
+
+    <div class="form-section">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Location</mat-label>
+        <input matInput formControlName="location" placeholder="Where is this place located?">
+      </mat-form-field>
+    </div>
+
+    <div class="form-section" *ngIf="tripItemForm.get('type')?.value !== 'note'">
+      <mat-label class="rating-label">Rating</mat-label>
+      <mat-slider min="1" max="5" step="1" discrete class="full-width">
+        <input matSliderThumb formControlName="rating">
+      </mat-slider>
+      <div class="rating-value" *ngIf="tripItemForm.get('rating')?.value">
+        {{ tripItemForm.get('rating')?.value }} / 5
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="image-section">
+        <button type="button" mat-stroked-button (click)="fileInput.click()" *ngIf="!imagePreview">
+          <mat-icon>add_photo_alternate</mat-icon>
+          Add Photo
+        </button>
+        <input hidden type="file" #fileInput (change)="onFileSelected($event)" accept="image/*">
+        
+        <div class="image-preview-container" *ngIf="imagePreview">
+          <div class="image-preview">
+            <img [src]="imagePreview" alt="Image preview">
+          </div>
+          <button type="button" mat-icon-button color="warn" (click)="removeImage()">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" mat-stroked-button (click)="onCancel()">Cancel</button>
+      <button type="submit" mat-raised-button color="primary" [disabled]="tripItemForm.invalid || isSubmitting">
+        <mat-spinner diameter="20" *ngIf="isSubmitting"></mat-spinner>
+        <span *ngIf="!isSubmitting">{{ isEdit ? 'Update' : 'Save' }}</span>
+      </button>
+    </div>
+  </form>
+</div>

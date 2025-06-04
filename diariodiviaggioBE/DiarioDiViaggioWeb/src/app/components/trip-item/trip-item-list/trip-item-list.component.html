@@ -1,0 +1,125 @@
+<div class="trip-item-list-container">
+  <div class="list-header">
+    <h2>Travel Diary Entries</h2>
+    <button mat-raised-button color="primary" (click)="openAddForm()" *ngIf="!showAddForm">
+      <mat-icon>add</mat-icon>
+      Add Entry
+    </button>
+  </div>
+
+  <div class="filters">
+    <div class="filter-title">Filter by:</div>
+    <div class="filter-chips">
+      <mat-chip-set selectable multiple>
+        <mat-chip 
+          [color]="activeFilters['restaurant'] ? 'primary' : undefined"
+          (click)="toggleFilter('restaurant')"
+          [class.active]="activeFilters['restaurant']">
+          <mat-icon>restaurant</mat-icon>
+          Restaurants
+        </mat-chip>
+        <mat-chip 
+          [color]="activeFilters['hotel'] ? 'primary' : undefined" 
+          (click)="toggleFilter('hotel')"
+          [class.active]="activeFilters['hotel']">
+          <mat-icon>hotel</mat-icon>
+          Hotels
+        </mat-chip>
+        <mat-chip 
+          [color]="activeFilters['attraction'] ? 'primary' : undefined" 
+          (click)="toggleFilter('attraction')"
+          [class.active]="activeFilters['attraction']">
+          <mat-icon>attractions</mat-icon>
+          Attractions
+        </mat-chip>
+        <mat-chip 
+          [color]="activeFilters['note'] ? 'primary' : undefined" 
+          (click)="toggleFilter('note')"
+          [class.active]="activeFilters['note']">
+          <mat-icon>note</mat-icon>
+          Notes
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+  </div>
+
+  <!-- Add/Edit Form -->
+  <div class="form-container" *ngIf="showAddForm">
+    <app-trip-item-form 
+      [tripId]="tripId"
+      [tripItem]="editingItem"
+      (saved)="onSaveItem($event)"
+      (cancelled)="closeForm()">
+    </app-trip-item-form>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading entries...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error">
+    <mat-icon color="warn">error</mat-icon>
+    <p>Failed to load entries. Please try again later.</p>
+    <button mat-stroked-button color="primary" (click)="loadTripItems()">
+      <mat-icon>refresh</mat-icon>
+      Retry
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-container" *ngIf="!loading && !error && tripItems.length === 0">
+    <mat-icon>article</mat-icon>
+    <p>No entries yet. Start adding your experiences!</p>
+    <button mat-raised-button color="primary" (click)="openAddForm()">
+      <mat-icon>add</mat-icon>
+      Add Entry
+    </button>
+  </div>
+
+  <!-- Trip Items List -->
+  <div class="trip-items" *ngIf="!loading && !error && tripItems.length > 0">
+    <div class="no-results" *ngIf="getFilteredItems().length === 0">
+      <p>No entries match the selected filters.</p>
+    </div>
+
+    <mat-card *ngFor="let item of getFilteredItems()" class="trip-item-card">
+      <mat-card-header>
+        <div mat-card-avatar class="item-avatar">
+          <mat-icon>{{ getTypeIcon(item.type) }}</mat-icon>
+        </div>
+        <mat-card-title>{{ item.title }}</mat-card-title>
+        <mat-card-subtitle>
+          <span>{{ getFormattedDate(item.createdAt) }}</span>
+          <span *ngIf="item.location">• {{ item.location }}</span>
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <img mat-card-image *ngIf="item.imageUrl" [src]="item.imageUrl" [alt]="item.title">
+      
+      <mat-card-content *ngIf="item.description">
+        <p>{{ item.description }}</p>
+      </mat-card-content>
+      
+      <div class="rating" *ngIf="item.rating">
+        <div class="stars">
+          <mat-icon *ngFor="let i of [1,2,3,4,5]" [class.filled]="i <= item.rating">star</mat-icon>
+        </div>
+        <span class="rating-text">{{ item.rating }} / 5</span>
+      </div>
+      
+      <mat-card-actions align="end">
+        <button mat-button color="primary" (click)="editItem(item)">
+          <mat-icon>edit</mat-icon>
+          Edit
+        </button>
+        <button mat-button color="warn" (click)="deleteItem(item)">
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

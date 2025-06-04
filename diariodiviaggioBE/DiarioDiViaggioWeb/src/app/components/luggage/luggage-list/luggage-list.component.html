@@ -1,0 +1,98 @@
+<div class="luggage-list-container">
+  <div class="list-header">
+    <h2>Luggage Lists</h2>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="toggleAddForm()" 
+      *ngIf="!showAddForm">
+      <mat-icon>add</mat-icon>
+      Add Luggage List
+    </button>
+  </div>
+
+  <!-- Add Form -->
+  <div class="add-form-container" *ngIf="showAddForm">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>New Luggage List</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="form-fields">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Name</mat-label>
+            <input matInput [(ngModel)]="newLuggage.name" placeholder="e.g. Summer Vacation Luggage" required>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput [(ngModel)]="newLuggage.description" placeholder="Add some details about this luggage list" rows="3"></textarea>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button (click)="toggleAddForm()">Cancel</button>
+        <button mat-raised-button color="primary" (click)="createLuggage()">Create</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading luggage lists...</p>
+  </div>
+  
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error">
+    <mat-icon color="warn">error</mat-icon>
+    <p>Failed to load luggage lists. Please try again later.</p>
+    <button mat-stroked-button color="primary" (click)="loadLuggages()">
+      <mat-icon>refresh</mat-icon>
+      Retry
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-container" *ngIf="!loading && !error && luggages.length === 0">
+    <mat-icon>luggage</mat-icon>
+    <p>No luggage lists yet. Create one to start packing for your trip!</p>
+    <button mat-raised-button color="primary" (click)="toggleAddForm()">
+      <mat-icon>add</mat-icon>
+      Add Luggage List
+    </button>
+  </div>
+
+  <!-- Luggage Lists -->
+  <div class="luggage-grid" *ngIf="!loading && !error && luggages.length > 0">
+    <mat-card *ngFor="let luggage of luggages" class="luggage-card">
+      <mat-card-header>
+        <div mat-card-avatar class="luggage-avatar">
+          <mat-icon>luggage</mat-icon>
+        </div>
+        <mat-card-title>{{ luggage.name }}</mat-card-title>
+        <mat-card-subtitle *ngIf="luggage.items">
+          {{ luggage.items.length }} items ({{ getPackedItemsCount(luggage.items) }} packed)
+        </mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content *ngIf="luggage.description">
+        <p>{{ luggage.description }}</p>
+      </mat-card-content>
+      
+      <mat-card-actions align="end">
+        <button mat-button color="warn" (click)="deleteLuggage(luggage)">
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      </mat-card-actions>
+
+      <mat-card-footer *ngIf="luggage.items?.length">
+        <mat-progress-bar 
+          mode="determinate" 
+          [value]="getPackingProgress(luggage.items)">
+        </mat-progress-bar>
+      </mat-card-footer>
+    </mat-card>
+  </div>
+</div>

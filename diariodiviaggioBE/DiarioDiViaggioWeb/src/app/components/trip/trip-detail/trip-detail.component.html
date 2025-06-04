@@ -1,0 +1,106 @@
+<div class="trip-detail-container">
+  <div class="header">
+    <button mat-icon-button routerLink="/trips">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>{{ isEditMode ? 'Modifica viaggio' : 'Nuovo viaggio' }}</h1>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <div *ngIf="!isLoading" class="content">
+    <form [formGroup]="tripForm" (ngSubmit)="saveTrip()">
+      <mat-card>
+        <mat-card-content>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Titolo</mat-label>
+            <input matInput formControlName="title" required>
+            <mat-error *ngIf="tripForm.get('title')?.hasError('required')">Il titolo è obbligatorio</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descrizione</mat-label>
+            <textarea matInput formControlName="description" rows="3"></textarea>
+          </mat-form-field>
+
+          <div class="date-fields">
+            <mat-form-field appearance="outline">
+              <mat-label>Data di inizio</mat-label>
+              <input matInput [matDatepicker]="startPicker" formControlName="startDate" required>
+              <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+              <mat-datepicker #startPicker></mat-datepicker>
+              <mat-error *ngIf="tripForm.get('startDate')?.hasError('required')">La data di inizio è obbligatoria</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Data di fine</mat-label>
+              <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+              <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+              <mat-datepicker #endPicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <div *ngIf="isEditMode && trip" class="share-section">
+            <mat-divider></mat-divider>
+            <h3>Condivisione</h3>
+            
+            <div class="share-code-container">
+              <p>Codice di condivisione:</p>
+              <div class="share-code">
+                <span>{{ trip.shareCode }}</span>
+                <button type="button" mat-icon-button (click)="copyShareCode(trip.shareCode)">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </div>
+              <p class="share-hint">Condividi questo codice con gli amici per invitarli al viaggio</p>
+            </div>
+
+            <div *ngIf="trip.sharedWithUsernames.length > 0" class="shared-users">
+              <h4>Condiviso con:</h4>
+              <mat-list>
+                <mat-list-item *ngFor="let username of trip.sharedWithUsernames">
+                  <mat-icon matListItemIcon>person</mat-icon>
+                  <span matListItemTitle>{{ username }}</span>
+                </mat-list-item>
+              </mat-list>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button type="button" mat-stroked-button routerLink="/trips">Annulla</button>
+          <button *ngIf="isEditMode" type="button" mat-stroked-button color="warn" (click)="deleteTrip()">Elimina</button>
+          <button type="submit" mat-raised-button color="primary" [disabled]="tripForm.invalid || isSaving">
+            <mat-spinner diameter="20" *ngIf="isSaving"></mat-spinner>
+            <span *ngIf="!isSaving">{{ isEditMode ? 'Aggiorna' : 'Crea' }}</span>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </form>
+
+    <div *ngIf="isEditMode && trip" class="trip-features-container">
+      <div class="trip-features">
+        <mat-card class="feature-card" routerLink="/trips/{{ trip.id }}/items">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>photo_camera</mat-icon>
+            <mat-card-title>Foto e Note</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Aggiungi foto, appunti, recensioni di hotel e ristoranti</p>
+          </mat-card-content>
+        </mat-card>
+        
+        <mat-card class="feature-card" routerLink="/trips/{{ trip.id }}/luggage">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>luggage</mat-icon>
+            <mat-card-title>Bagaglio</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Prepara il bagaglio per il tuo viaggio</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,145 @@
+.trip-item-list-container {
+  padding: 16px;
+
+  .list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    h2 {
+      margin: 0;
+      font-weight: 500;
+    }
+  }
+
+  .filters {
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    .filter-title {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.6);
+    }
+
+    .filter-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .active {
+      background-color: #3f51b5;
+      color: white;
+    }
+
+    mat-chip {
+      cursor: pointer;
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .form-container {
+    margin-bottom: 32px;
+  }
+
+  .loading-container, .error-container, .empty-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 0;
+    text-align: center;
+
+    mat-icon {
+      font-size: 48px;
+      height: 48px;
+      width: 48px;
+      margin-bottom: 16px;
+    }
+
+    p {
+      margin-bottom: 16px;
+      color: rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  .error-container {
+    mat-icon {
+      color: #f44336;
+    }
+  }
+
+  .trip-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: rgba(0, 0, 0, 0.6);
+      padding: 32px 0;
+    }
+  }
+
+  .trip-item-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+
+    .item-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f0f0f0;
+
+      mat-icon {
+        color: #3f51b5;
+      }
+    }
+
+    mat-card-content {
+      flex-grow: 1;
+      margin-top: 16px;
+    }
+
+    .rating {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 16px 16px 0;
+
+      .stars {
+        display: flex;
+        
+        mat-icon {
+          color: #d3d3d3;
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+
+          &.filled {
+            color: #ffc107;
+          }
+        }
+      }
+
+      .rating-text {
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.6);
+      }
+    }
+  }
+}

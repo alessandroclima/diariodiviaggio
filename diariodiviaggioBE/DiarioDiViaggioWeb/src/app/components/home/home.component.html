@@ -1,0 +1,61 @@
+<div class="home-container">
+  <div class="hero">
+    <h1>Diario di Viaggio</h1>
+    <p class="tagline">Pianifica, condividi e ricorda ogni momento dei tuoi viaggi</p>
+    
+    <div class="hero-actions">
+      <button mat-raised-button color="primary" routerLink="/trips" *ngIf="isLoggedIn()">
+        I miei viaggi
+      </button>
+      <button mat-raised-button color="primary" routerLink="/login" *ngIf="!isLoggedIn()">
+        Inizia ora
+      </button>
+    </div>
+  </div>
+
+  <div class="features">
+    <h2>Funzionalità principali</h2>
+    
+    <div class="feature-grid">
+      <mat-card class="feature-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>map</mat-icon>
+          <mat-card-title>Pianifica gli itinerari</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Crea itinerari dettagliati per i tuoi viaggi, aggiungendo date, destinazioni e note.</p>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="feature-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>photo_camera</mat-icon>
+          <mat-card-title>Aggiungi foto e ricordi</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Salva foto, annotazioni e recensioni di ristoranti, hotel e attrazioni visitate.</p>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="feature-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>luggage</mat-icon>
+          <mat-card-title>Gestisci il bagaglio</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Crea liste di bagagli personalizzate per ogni viaggio e tieni traccia di ciò che hai già preparato.</p>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="feature-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>group</mat-icon>
+          <mat-card-title>Condividi con gli amici</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Condividi i tuoi viaggi con amici e familiari tramite un semplice codice di condivisione.</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
