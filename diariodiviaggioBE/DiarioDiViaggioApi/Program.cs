@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using DiarioDiViaggioApi.Data;
+using DiarioDiViaggioApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
