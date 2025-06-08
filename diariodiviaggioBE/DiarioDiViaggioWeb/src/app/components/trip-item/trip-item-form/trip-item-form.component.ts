@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CreateTripItemRequest, TripItem, TripItemService, UpdateTripItemRequest } from '../../../services/trip-item.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-trip-item-form',
@@ -30,10 +31,25 @@ export class TripItemFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder, 
     private tripItemService: TripItemService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
+
+
+    
+    if(this.tripId <= 0) {
+       this.route.paramMap.subscribe(params => {
+        //parse tripId from route parameters
+        const tripIdParam = params.get('tripId');
+        if (tripIdParam) {
+          this.tripId = parseInt(tripIdParam, 10);
+        }
+    });
+    }
+    // Check if tripItem is provided, if not, initialize it
+    console.log('Trip ID:', this.tripId);
     this.isEdit = !!this.tripItem;
 
     this.tripItemForm = this.fb.group({

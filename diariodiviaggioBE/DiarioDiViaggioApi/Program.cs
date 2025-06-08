@@ -43,15 +43,6 @@ builder.Services.AddScoped<ITripService, TripService>();
 builder.Services.AddScoped<ITripItemService, TripItemService>();
 builder.Services.AddScoped<ILuggageService, LuggageService>();
 
-// Configure CORS for Angular frontend
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAngularDev", builder =>
-        builder.WithOrigins("http://localhost:4200")
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials());
-});
 
 var app = builder.Build();
 
@@ -62,7 +53,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAngularDev");
+app.UseCors(options =>
+{
+    options.AllowAnyHeader();
+    options.AllowAnyOrigin();
+    options.AllowAnyMethod();
+});
 
 app.UseAuthentication();
 app.UseAuthorization();
