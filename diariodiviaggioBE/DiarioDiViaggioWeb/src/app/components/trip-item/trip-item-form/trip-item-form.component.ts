@@ -10,7 +10,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./trip-item-form.component.scss']
 })
 export class TripItemFormComponent implements OnInit {
-  @Input() tripId: number = 0;
+  @Input('tripId') tripId: number = 0;
   @Input() tripItem?: TripItem | null = null;
   @Output() saved = new EventEmitter<TripItem>();
   @Output() cancelled = new EventEmitter<void>();

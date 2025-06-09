@@ -11,6 +11,7 @@ import { LuggageListComponent } from './components/luggage/luggage-list/luggage-
 
 import { AuthGuard } from './guards/auth.guard';
 
+
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
@@ -18,15 +19,15 @@ const routes: Routes = [
   { path: 'trips', component: TripListComponent, canActivate: [AuthGuard] },
   { path: 'trips/new', component: TripDetailComponent, canActivate: [AuthGuard] },
   { path: 'trips/:id', component: TripDetailComponent, canActivate: [AuthGuard] },
-  { path: 'trips/:id/items', component: TripItemListComponent, canActivate: [AuthGuard] },
-  { path: 'trips/:id/items/new', component: TripItemFormComponent, canActivate: [AuthGuard] },
+  { path: 'trips/:tripId/items', component: TripItemListComponent, canActivate: [AuthGuard] },
+  { path: 'trips/:tripId/items/new', component: TripItemFormComponent, canActivate: [AuthGuard] },
   { path: 'trips/:tripId/items/:id', component: TripItemFormComponent, canActivate: [AuthGuard] },
-  { path: 'trips/:id/luggage', component: LuggageListComponent, canActivate: [AuthGuard] },
+  { path: 'trips/:tripId/luggage', component: LuggageListComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '' }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes,{bindToComponentInputs: true})],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

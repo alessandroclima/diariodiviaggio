@@ -10,7 +10,7 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dial
   styleUrls: ['./trip-item-list.component.scss']
 })
 export class TripItemListComponent implements OnInit {
-  @Input() tripId!: number;
+  @Input('tripId') tripId!: number;
   
   tripItems: TripItem[] = [];
   loading = true;
@@ -33,6 +33,7 @@ export class TripItemListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    console.log('TripItemListComponent initialized with tripId:', this.tripId);
     this.loadTripItems();
   }
 

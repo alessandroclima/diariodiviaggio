@@ -46,6 +46,7 @@ import { HomeComponent } from './components/home/home.component';
 
 // Pipes
 import { FilterByPipe } from './pipes/filter-by.pipe';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
