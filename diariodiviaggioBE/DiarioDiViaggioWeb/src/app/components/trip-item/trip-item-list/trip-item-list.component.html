@@ -1,50 +1,56 @@
-<div class="trip-item-list-container">
-  <div class="list-header">
-    <h2>Travel Diary Entries</h2>
-    <button mat-raised-button color="primary" (click)="openAddForm()" *ngIf="!showAddForm">
-      <mat-icon>add</mat-icon>
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Travel Diary Entries</h2>
+    <button class="btn btn-primary" (click)="openAddForm()" *ngIf="!showAddForm">
+      <i class="bi bi-plus-circle me-2"></i>
       Add Entry
     </button>
   </div>
 
-  <div class="filters">
-    <div class="filter-title">Filter by:</div>
-    <div class="filter-chips">
-      <mat-chip-set selectable multiple>
-        <mat-chip 
-          [color]="activeFilters['restaurant'] ? 'primary' : undefined"
-          (click)="toggleFilter('restaurant')"
-          [class.active]="activeFilters['restaurant']">
-          <mat-icon>restaurant</mat-icon>
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h6 class="card-title mb-3">Filter by:</h6>
+      <div class="d-flex flex-wrap gap-2">
+        <button 
+          type="button"
+          class="btn btn-outline-primary"
+          [class.active]="activeFilters['restaurant']"
+          (click)="toggleFilter('restaurant')">
+          <i class="bi bi-shop me-1"></i>
           Restaurants
-        </mat-chip>
-        <mat-chip 
-          [color]="activeFilters['hotel'] ? 'primary' : undefined" 
-          (click)="toggleFilter('hotel')"
-          [class.active]="activeFilters['hotel']">
-          <mat-icon>hotel</mat-icon>
+        </button>
+        <button 
+          type="button"
+          class="btn btn-outline-primary"
+          [class.active]="activeFilters['hotel']"
+          (click)="toggleFilter('hotel')">
+          <i class="bi bi-house me-1"></i>
           Hotels
-        </mat-chip>
-        <mat-chip 
-          [color]="activeFilters['attraction'] ? 'primary' : undefined" 
-          (click)="toggleFilter('attraction')"
-          [class.active]="activeFilters['attraction']">
-          <mat-icon>attractions</mat-icon>
+        </button>
+        <button 
+          type="button"
+          class="btn btn-outline-primary"
+          [class.active]="activeFilters['attraction']"
+          (click)="toggleFilter('attraction')">
+          <i class="bi bi-geo-alt me-1"></i>
           Attractions
-        </mat-chip>
-        <mat-chip 
-          [color]="activeFilters['note'] ? 'primary' : undefined" 
-          (click)="toggleFilter('note')"
-          [class.active]="activeFilters['note']">
-          <mat-icon>note</mat-icon>
+        </button>
+        <button 
+          type="button"
+          class="btn btn-outline-primary"
+          [class.active]="activeFilters['note']"
+          (click)="toggleFilter('note')">
+          <i class="bi bi-sticky me-1"></i>
           Notes
-        </mat-chip>
-      </mat-chip-set>
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- Add/Edit Form -->
-  <div class="form-container" *ngIf="showAddForm">
+  <div class="mb-4" *ngIf="showAddForm">
     <app-trip-item-form 
       [tripId]="tripId"
       [tripItem]="editingItem"
@@ -54,72 +60,93 @@
   </div>
 
   <!-- Loading State -->
-  <div class="loading-container" *ngIf="loading">
-    <mat-spinner diameter="40"></mat-spinner>
-    <p>Loading entries...</p>
+  <div class="text-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary mb-3" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-muted">Loading entries...</p>
   </div>
 
   <!-- Error State -->
-  <div class="error-container" *ngIf="error">
-    <mat-icon color="warn">error</mat-icon>
-    <p>Failed to load entries. Please try again later.</p>
-    <button mat-stroked-button color="primary" (click)="loadTripItems()">
-      <mat-icon>refresh</mat-icon>
+  <div class="alert alert-danger text-center" *ngIf="error">
+    <i class="bi bi-exclamation-triangle fs-1 mb-3 d-block"></i>
+    <p class="mb-3">Failed to load entries. Please try again later.</p>
+    <button class="btn btn-outline-primary" (click)="loadTripItems()">
+      <i class="bi bi-arrow-clockwise me-2"></i>
       Retry
     </button>
   </div>
 
   <!-- Empty State -->
-  <div class="empty-container" *ngIf="!loading && !error && tripItems.length === 0">
-    <mat-icon>article</mat-icon>
-    <p>No entries yet. Start adding your experiences!</p>
-    <button mat-raised-button color="primary" (click)="openAddForm()">
-      <mat-icon>add</mat-icon>
+  <div class="text-center py-5" *ngIf="!loading && !error && tripItems.length === 0">
+    <i class="bi bi-file-text fs-1 text-muted mb-3 d-block"></i>
+    <p class="text-muted mb-3">No entries yet. Start adding your experiences!</p>
+    <button class="btn btn-primary" (click)="openAddForm()">
+      <i class="bi bi-plus-circle me-2"></i>
       Add Entry
     </button>
   </div>
 
   <!-- Trip Items List -->
-  <div class="trip-items" *ngIf="!loading && !error && tripItems.length > 0">
-    <div class="no-results" *ngIf="getFilteredItems().length === 0">
-      <p>No entries match the selected filters.</p>
+  <div *ngIf="!loading && !error && tripItems.length > 0">
+    <!-- No Results Message -->
+    <div class="text-center py-3" *ngIf="getFilteredItems().length === 0">
+      <p class="text-muted">No entries match the selected filters.</p>
     </div>
 
-    <mat-card *ngFor="let item of getFilteredItems()" class="trip-item-card">
-      <mat-card-header>
-        <div mat-card-avatar class="item-avatar">
-          <mat-icon>{{ getTypeIcon(item.type) }}</mat-icon>
-        </div>
-        <mat-card-title>{{ item.title }}</mat-card-title>
-        <mat-card-subtitle>
-          <span>{{ getFormattedDate(item.createdAt) }}</span>
-          <span *ngIf="item.location">• {{ item.location }}</span>
-        </mat-card-subtitle>
-      </mat-card-header>
+    <!-- Items Grid -->
+    <div class="row g-4" *ngIf="getFilteredItems().length > 0">
+      <div class="col-lg-4 col-md-6" *ngFor="let item of getFilteredItems()">
+        <div class="card h-100 shadow-sm">
+          <!-- Card Header -->
+          <div class="card-header bg-transparent border-bottom-0 pb-0">
+            <div class="d-flex align-items-center">
+              <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" 
+                   style="width: 40px; height: 40px;">
+                <i class="{{ getTypeIcon(item.type) }}"></i>
+              </div>
+              <div class="flex-grow-1">
+                <h6 class="card-title mb-1">{{ item.title }}</h6>
+                <small class="text-muted">
+                  {{ getFormattedDate(item.createdAt) }}
+                  <span *ngIf="item.location"> • {{ item.location }}</span>
+                </small>
+              </div>
+            </div>
+          </div>
 
-      <img mat-card-image *ngIf="item.imageUrl" [src]="item.imageUrl" [alt]="item.title">
-      
-      <mat-card-content *ngIf="item.description">
-        <p>{{ item.description }}</p>
-      </mat-card-content>
-      
-      <div class="rating" *ngIf="item.rating">
-        <div class="stars">
-          <mat-icon *ngFor="let i of [1,2,3,4,5]" [class.filled]="i <= item.rating">star</mat-icon>
+          <!-- Card Image -->
+          <img class="card-img-top" *ngIf="item.imageUrl" [src]="item.imageUrl" [alt]="item.title" style="height: 200px; object-fit: cover;">
+          
+          <!-- Card Body -->
+          <div class="card-body" *ngIf="item.description || item.rating">
+            <p class="card-text" *ngIf="item.description">{{ item.description }}</p>
+            
+            <!-- Rating -->
+            <div class="d-flex align-items-center" *ngIf="item.rating">
+              <div class="me-2">
+                <i class="bi bi-star-fill text-warning" *ngFor="let i of [1,2,3,4,5]" 
+                   [class.text-muted]="i > item.rating"></i>
+              </div>
+              <small class="text-muted">{{ item.rating }} / 5</small>
+            </div>
+          </div>
+          
+          <!-- Card Actions -->
+          <div class="card-footer bg-transparent border-top-0">
+            <div class="d-flex justify-content-end gap-2">
+              <button class="btn btn-outline-primary btn-sm" (click)="editItem(item)">
+                <i class="bi bi-pencil me-1"></i>
+                Edit
+              </button>
+              <button class="btn btn-outline-danger btn-sm" (click)="deleteItem(item)">
+                <i class="bi bi-trash me-1"></i>
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
-        <span class="rating-text">{{ item.rating }} / 5</span>
       </div>
-      
-      <mat-card-actions align="end">
-        <button mat-button color="primary" (click)="editItem(item)">
-          <mat-icon>edit</mat-icon>
-          Edit
-        </button>
-        <button mat-button color="warn" (click)="deleteItem(item)">
-          <mat-icon>delete</mat-icon>
-          Delete
-        </button>
-      </mat-card-actions>
-    </mat-card>
+    </div>
   </div>
 </div>

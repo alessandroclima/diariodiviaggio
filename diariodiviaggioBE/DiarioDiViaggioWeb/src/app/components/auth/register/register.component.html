@@ -1,42 +1,55 @@
 <div class="auth-container">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Registrati</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
+  <div class="card">
+    <div class="card-header">
+      <h4 class="card-title mb-0">Registrati</h4>
+    </div>
+    <div class="card-body">
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Username</mat-label>
-          <input matInput formControlName="username" required>
-          <mat-error *ngIf="registerForm.get('username')?.hasError('required')">Username è obbligatorio</mat-error>
-          <mat-error *ngIf="registerForm.get('username')?.hasError('minlength')">Username deve avere almeno 3 caratteri</mat-error>
-        </mat-form-field>
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" formControlName="username" required
+                 [class.is-invalid]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
+          <div class="invalid-feedback">
+            <div *ngIf="registerForm.get('username')?.hasError('required')">Username è obbligatorio</div>
+            <div *ngIf="registerForm.get('username')?.hasError('minlength')">Username deve avere almeno 3 caratteri</div>
+          </div>
+        </div>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email</mat-label>
-          <input matInput type="email" formControlName="email" required>
-          <mat-error *ngIf="registerForm.get('email')?.hasError('required')">Email è obbligatoria</mat-error>
-          <mat-error *ngIf="registerForm.get('email')?.hasError('email')">Inserisci un'email valida</mat-error>
-        </mat-form-field>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" formControlName="email" required
+                 [class.is-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+          <div class="invalid-feedback">
+            <div *ngIf="registerForm.get('email')?.hasError('required')">Email è obbligatoria</div>
+            <div *ngIf="registerForm.get('email')?.hasError('email')">Inserisci un'email valida</div>
+          </div>
+        </div>
         
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Password</mat-label>
-          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" required>
-          <button mat-icon-button type="button" matSuffix (click)="hidePassword = !hidePassword">
-            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-          </button>
-          <mat-error *ngIf="registerForm.get('password')?.hasError('required')">Password è obbligatoria</mat-error>
-          <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">Password deve avere almeno 6 caratteri</mat-error>
-        </mat-form-field>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-group">
+            <input [type]="hidePassword ? 'password' : 'text'" class="form-control" id="password" 
+                   formControlName="password" required
+                   [class.is-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+            <button class="btn btn-outline-secondary" type="button" (click)="hidePassword = !hidePassword">
+              <i class="bi" [class.bi-eye]="hidePassword" [class.bi-eye-slash]="!hidePassword"></i>
+            </button>
+          </div>
+          <div class="invalid-feedback" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+            <div *ngIf="registerForm.get('password')?.hasError('required')">Password è obbligatoria</div>
+            <div *ngIf="registerForm.get('password')?.hasError('minlength')">Password deve avere almeno 6 caratteri</div>
+          </div>
+        </div>
 
-        <div class="form-actions">
-          <button mat-stroked-button type="button" routerLink="/login">Già registrato? Accedi</button>
-          <button mat-raised-button color="primary" type="submit" [disabled]="registerForm.invalid || isLoading">
-            <mat-spinner diameter="20" *ngIf="isLoading"></mat-spinner>
+        <div class="d-flex justify-content-between align-items-center">
+          <button type="button" class="btn btn-outline-primary" routerLink="/login">Già registrato? Accedi</button>
+          <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid || isLoading">
+            <span class="spinner-border spinner-border-sm me-2" *ngIf="isLoading" role="status" aria-hidden="true"></span>
             <span *ngIf="!isLoading">Registrati</span>
+            <span *ngIf="isLoading">Registrazione...</span>
           </button>
         </div>
       </form>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </div>
 </div>

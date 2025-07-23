@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 
 @NgModule({
@@ -10,8 +9,7 @@ import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.componen
   ],
   imports: [
     CommonModule,
-    MatDialogModule,
-    MatButtonModule
+    NgbModule
   ],
   exports: [
     ConfirmDialogComponent

@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog } from '@angular/material/dialog';
 import { TripService, Trip, CreateTripRequest, UpdateTripRequest } from '../../../services/trip.service';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-trip-detail',
@@ -23,8 +22,7 @@ export class TripDetailComponent implements OnInit {
     private tripService: TripService,
     private route: ActivatedRoute,
     private router: Router,
-    private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -62,9 +60,7 @@ export class TripDetailComponent implements OnInit {
           this.isLoading = false;
         },
         error: (error) => {
-          this.snackBar.open(error.error?.message || 'Errore nel caricamento del viaggio', 'Chiudi', {
-            duration: 5000,
-          });
+          this.notificationService.showError(error.error?.message || 'Errore nel caricamento del viaggio');
           this.router.navigate(['/trips']);
           this.isLoading = false;
         }
@@ -86,15 +82,11 @@ export class TripDetailComponent implements OnInit {
       this.tripService.updateTrip(this.tripId, updateRequest)
         .subscribe({
           next: () => {
-            this.snackBar.open('Viaggio aggiornato con successo', 'Chiudi', {
-              duration: 3000,
-            });
+            this.notificationService.showSuccess('Viaggio aggiornato con successo');
             this.isSaving = false;
           },
           error: (error) => {
-            this.snackBar.open(error.error?.message || 'Errore nell\'aggiornamento del viaggio', 'Chiudi', {
-              duration: 5000,
-            });
+            this.notificationService.showError(error.error?.message || 'Errore nell\'aggiornamento del viaggio');
             this.isSaving = false;
           }
         });
@@ -108,16 +100,12 @@ export class TripDetailComponent implements OnInit {
       this.tripService.createTrip(createRequest)
         .subscribe({
           next: (trip) => {
-            this.snackBar.open('Viaggio creato con successo', 'Chiudi', {
-              duration: 3000,
-            });
+            this.notificationService.showSuccess('Viaggio creato con successo');
             this.router.navigate(['/trips', trip.id]);
             this.isSaving = false;
           },
           error: (error) => {
-            this.snackBar.open(error.error?.message || 'Errore nella creazione del viaggio', 'Chiudi', {
-              duration: 5000,
-            });
+            this.notificationService.showError(error.error?.message || 'Errore nella creazione del viaggio');
             this.isSaving = false;
           }
         });
@@ -132,15 +120,11 @@ export class TripDetailComponent implements OnInit {
       this.tripService.deleteTrip(this.tripId)
         .subscribe({
           next: () => {
-            this.snackBar.open('Viaggio eliminato con successo', 'Chiudi', {
-              duration: 3000,
-            });
+            this.notificationService.showSuccess('Viaggio eliminato con successo');
             this.router.navigate(['/trips']);
           },
           error: (error) => {
-            this.snackBar.open(error.error?.message || 'Errore nell\'eliminazione del viaggio', 'Chiudi', {
-              duration: 5000,
-            });
+            this.notificationService.showError(error.error?.message || 'Errore nell\'eliminazione del viaggio');
             this.isLoading = false;
           }
         });
@@ -149,9 +133,7 @@ export class TripDetailComponent implements OnInit {
 
   copyShareCode(code: string): void {
     navigator.clipboard.writeText(code).then(() => {
-      this.snackBar.open('Codice copiato negli appunti', 'Chiudi', {
-        duration: 3000,
-      });
+      this.notificationService.showSuccess('Codice copiato negli appunti');
     });
   }
 

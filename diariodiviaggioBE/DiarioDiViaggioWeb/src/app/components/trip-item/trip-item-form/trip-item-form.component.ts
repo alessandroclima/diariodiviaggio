@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { CreateTripItemRequest, TripItem, TripItemService, UpdateTripItemRequest } from '../../../services/trip-item.service';
 import { ActivatedRoute } from '@angular/router';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-trip-item-form',
@@ -31,7 +31,7 @@ export class TripItemFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder, 
     private tripItemService: TripItemService,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     private route: ActivatedRoute
   ) { }
 
@@ -106,12 +106,12 @@ export class TripItemFormComponent implements OnInit {
     this.tripItemService.createTripItem(this.tripId, request).subscribe({
       next: (result) => {
         this.isSubmitting = false;
-        this.snackBar.open('Trip item created successfully', 'Close', { duration: 3000 });
+        this.notificationService.showSuccess('Trip item created successfully');
         this.saved.emit(result);
       },
       error: (error) => {
         this.isSubmitting = false;
-        this.snackBar.open('Failed to create trip item', 'Close', { duration: 3000 });
+        this.notificationService.showError('Failed to create trip item');
         console.error('Error creating trip item:', error);
       }
     });
@@ -130,12 +130,12 @@ export class TripItemFormComponent implements OnInit {
     this.tripItemService.updateTripItem(this.tripItem.id, request).subscribe({
       next: (result) => {
         this.isSubmitting = false;
-        this.snackBar.open('Trip item updated successfully', 'Close', { duration: 3000 });
+        this.notificationService.showSuccess('Trip item updated successfully');
         this.saved.emit(result);
       },
       error: (error) => {
         this.isSubmitting = false;
-        this.snackBar.open('Failed to update trip item', 'Close', { duration: 3000 });
+        this.notificationService.showError('Failed to update trip item');
         console.error('Error updating trip item:', error);
       }
     });

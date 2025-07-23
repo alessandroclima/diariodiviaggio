@@ -1,5 +1,4 @@
-import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 export interface ConfirmDialogData {
   title: string;
@@ -14,16 +13,31 @@ export interface ConfirmDialogData {
   styleUrls: ['./confirm-dialog.component.scss']
 })
 export class ConfirmDialogComponent {
-  constructor(
-    public dialogRef: MatDialogRef<ConfirmDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: ConfirmDialogData
-  ) { }
+  @Input() data: ConfirmDialogData = {
+    title: 'Conferma',
+    message: 'Sei sicuro?',
+    confirmButtonText: 'Conferma',
+    cancelButtonText: 'Annulla'
+  };
+  @Input() isVisible: boolean = false;
+  @Output() confirmed = new EventEmitter<boolean>();
+  @Output() visibilityChange = new EventEmitter<boolean>();
 
   onCancel(): void {
-    this.dialogRef.close(false);
+    this.isVisible = false;
+    this.visibilityChange.emit(false);
+    this.confirmed.emit(false);
   }
 
   onConfirm(): void {
-    this.dialogRef.close(true);
+    this.isVisible = false;
+    this.visibilityChange.emit(false);
+    this.confirmed.emit(true);
+  }
+
+  onBackdropClick(event: Event): void {
+    if (event.target === event.currentTarget) {
+      this.onCancel();
+    }
   }
 }

@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TripItem, TripItemService } from '../../../services/trip-item.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-trip-item-list',
@@ -28,8 +28,8 @@ export class TripItemListComponent implements OnInit {
 
   constructor(
     private tripItemService: TripItemService,
-    private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private modal: NgbModal,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -50,7 +50,7 @@ export class TripItemListComponent implements OnInit {
         console.error('Error loading trip items:', err);
         this.loading = false;
         this.error = true;
-        this.snackBar.open('Failed to load trip items', 'Close', { duration: 3000 });
+        this.notificationService.showError('Failed to load trip items');
       }
     });
   }
@@ -86,28 +86,26 @@ export class TripItemListComponent implements OnInit {
   }
 
   deleteItem(item: TripItem): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '350px',
-      data: {
-        title: 'Delete Entry',
-        message: `Are you sure you want to delete "${item.title}"?`,
-        confirmButtonText: 'Delete'
-      }
-    });
+    const modalRef = this.modal.open(ConfirmDialogComponent);
+    modalRef.componentInstance.title = 'Delete Entry';
+    modalRef.componentInstance.message = `Are you sure you want to delete "${item.title}"?`;
+    modalRef.componentInstance.confirmButtonText = 'Delete';
 
-    dialogRef.afterClosed().subscribe(result => {
+    modalRef.result.then((result: boolean) => {
       if (result) {
         this.tripItemService.deleteTripItem(item.id).subscribe({
           next: () => {
             this.tripItems = this.tripItems.filter(i => i.id !== item.id);
-            this.snackBar.open('Entry deleted successfully', 'Close', { duration: 3000 });
+            this.notificationService.showSuccess('Entry deleted successfully');
           },
           error: (err) => {
             console.error('Error deleting trip item:', err);
-            this.snackBar.open('Failed to delete entry', 'Close', { duration: 3000 });
+            this.notificationService.showError('Failed to delete entry');
           }
         });
       }
+    }).catch(() => {
+      // Modal dismissed
     });
   }
 
@@ -125,11 +123,11 @@ export class TripItemListComponent implements OnInit {
 
   getTypeIcon(type: string): string {
     switch (type) {
-      case 'restaurant': return 'restaurant';
-      case 'hotel': return 'hotel';
-      case 'attraction': return 'attractions';
-      case 'note': return 'note';
-      default: return 'article';
+      case 'restaurant': return 'bi-shop';
+      case 'hotel': return 'bi-house';
+      case 'attraction': return 'bi-geo-alt';
+      case 'note': return 'bi-sticky';
+      default: return 'bi-file-text';
     }
   }
 

@@ -1,4 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 
+// Bootstrap import
+@import 'bootstrap/scss/bootstrap';
+// Bootstrap Icons import
+@import 'bootstrap-icons/font/bootstrap-icons';
+
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }

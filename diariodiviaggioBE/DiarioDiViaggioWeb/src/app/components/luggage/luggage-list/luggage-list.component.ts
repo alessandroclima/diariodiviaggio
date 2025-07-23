@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Luggage, LuggageService, CreateLuggageRequest } from '../../../services/luggage.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-luggage-list',
@@ -24,8 +24,8 @@ export class LuggageListComponent implements OnInit {
 
   constructor(
     private luggageService: LuggageService,
-    private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private modal: NgbModal,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -45,7 +45,7 @@ export class LuggageListComponent implements OnInit {
         console.error('Error loading luggages:', err);
         this.loading = false;
         this.error = true;
-        this.snackBar.open('Failed to load luggage lists', 'Close', { duration: 3000 });
+        this.notificationService.showError('Failed to load luggage lists');
       }
     });
   }
@@ -63,7 +63,7 @@ export class LuggageListComponent implements OnInit {
 
   createLuggage(): void {
     if (!this.newLuggage.name.trim()) {
-      this.snackBar.open('Please provide a name for the luggage list', 'Close', { duration: 3000 });
+      this.notificationService.showError('Please provide a name for the luggage list');
       return;
     }
 
@@ -71,38 +71,36 @@ export class LuggageListComponent implements OnInit {
       next: (luggage) => {
         this.luggages.push(luggage);
         this.showAddForm = false;
-        this.snackBar.open('Luggage list created successfully', 'Close', { duration: 3000 });
+        this.notificationService.showSuccess('Luggage list created successfully');
       },
       error: (err) => {
         console.error('Error creating luggage:', err);
-        this.snackBar.open('Failed to create luggage list', 'Close', { duration: 3000 });
+        this.notificationService.showError('Failed to create luggage list');
       }
     });
   }
 
   deleteLuggage(luggage: Luggage): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '350px',
-      data: {
-        title: 'Delete Luggage',
-        message: `Are you sure you want to delete "${luggage.name}"?`,
-        confirmButtonText: 'Delete'
-      }
-    });
+    const modalRef = this.modal.open(ConfirmDialogComponent);
+    modalRef.componentInstance.title = 'Delete Luggage';
+    modalRef.componentInstance.message = `Are you sure you want to delete "${luggage.name}"?`;
+    modalRef.componentInstance.confirmButtonText = 'Delete';
 
-    dialogRef.afterClosed().subscribe(result => {
+    modalRef.result.then((result: boolean) => {
       if (result) {
         this.luggageService.deleteLuggage(luggage.id).subscribe({
           next: () => {
             this.luggages = this.luggages.filter(l => l.id !== luggage.id);
-            this.snackBar.open('Luggage list deleted successfully', 'Close', { duration: 3000 });
+            this.notificationService.showSuccess('Luggage list deleted successfully');
           },
           error: (err) => {
             console.error('Error deleting luggage:', err);
-            this.snackBar.open('Failed to delete luggage list', 'Close', { duration: 3000 });
+            this.notificationService.showError('Failed to delete luggage list');
           }
         });
       }
+    }).catch(() => {
+      // Modal dismissed
     });
   }
 

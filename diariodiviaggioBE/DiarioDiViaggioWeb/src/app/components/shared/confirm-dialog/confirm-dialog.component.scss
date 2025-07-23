@@ -1,13 +1,17 @@
-.confirm-dialog {
-  .mat-dialog-title {
-    margin-bottom: 16px;
-  }
+// Custom styles for confirm dialog
+.modal {
+  z-index: 1055;
+}
 
-  .mat-dialog-content {
-    margin-bottom: 20px;
-  }
+.modal-backdrop {
+  z-index: 1050;
+}
 
-  .mat-dialog-actions {
-    padding: 8px 0;
-  }
+.modal-content {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-body p {
+  margin-bottom: 0;
+  color: var(--bs-body-color);
 }

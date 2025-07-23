@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService, LoginRequest } from '../../../services/auth.service';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -50,9 +50,7 @@ export class LoginComponent implements OnInit {
           this.router.navigate([this.returnUrl]);
         },
         error: (error) => {
-          this.snackBar.open(error.error?.message || 'Si è verificato un errore durante il login', 'Chiudi', {
-            duration: 5000,
-          });
+          this.notificationService.showError(error.error?.message || 'Si è verificato un errore durante il login');
           this.isLoading = false;
         }
       });

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TripService, Trip } from '../../../services/trip.service';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-trip-list',
@@ -14,7 +14,7 @@ export class TripListComponent implements OnInit {
 
   constructor(
     private tripService: TripService,
-    private snackBar: MatSnackBar
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -30,9 +30,7 @@ export class TripListComponent implements OnInit {
           this.isLoading = false;
         },
         error: (error) => {
-          this.snackBar.open(error.error?.message || 'Errore nel caricamento dei viaggi', 'Chiudi', {
-            duration: 5000,
-          });
+          this.notificationService.showError(error.error?.message || 'Errore nel caricamento dei viaggi');
           this.isLoading = false;
         }
       });
@@ -45,17 +43,13 @@ export class TripListComponent implements OnInit {
     this.tripService.joinTrip(this.shareCode)
       .subscribe({
         next: (trip) => {
-          this.snackBar.open(`Ti sei unito al viaggio ${trip.title} con successo!`, 'Chiudi', {
-            duration: 5000,
-          });
+          this.notificationService.showSuccess(`Ti sei unito al viaggio ${trip.title} con successo!`);
           this.loadTrips();
           this.shareCode = '';
           this.isLoading = false;
         },
         error: (error) => {
-          this.snackBar.open(error.error?.message || 'Codice di condivisione non valido', 'Chiudi', {
-            duration: 5000,
-          });
+          this.notificationService.showError(error.error?.message || 'Codice di condivisione non valido');
           this.isLoading = false;
         }
       });

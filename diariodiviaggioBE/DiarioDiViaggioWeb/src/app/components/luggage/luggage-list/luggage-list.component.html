@@ -1,98 +1,132 @@
-<div class="luggage-list-container">
-  <div class="list-header">
-    <h2>Luggage Lists</h2>
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Luggage Lists</h2>
     <button 
-      mat-raised-button 
-      color="primary" 
+      class="btn btn-primary" 
       (click)="toggleAddForm()" 
       *ngIf="!showAddForm">
-      <mat-icon>add</mat-icon>
+      <i class="bi bi-plus-circle me-2"></i>
       Add Luggage List
     </button>
   </div>
 
   <!-- Add Form -->
-  <div class="add-form-container" *ngIf="showAddForm">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>New Luggage List</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="form-fields">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Name</mat-label>
-            <input matInput [(ngModel)]="newLuggage.name" placeholder="e.g. Summer Vacation Luggage" required>
-          </mat-form-field>
-          
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Description</mat-label>
-            <textarea matInput [(ngModel)]="newLuggage.description" placeholder="Add some details about this luggage list" rows="3"></textarea>
-          </mat-form-field>
+  <div class="mb-4" *ngIf="showAddForm">
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h5 class="card-title mb-0">New Luggage List</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label for="luggageName" class="form-label">Name *</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="luggageName"
+            [(ngModel)]="newLuggage.name" 
+            placeholder="e.g. Summer Vacation Luggage" 
+            required>
         </div>
-      </mat-card-content>
-      <mat-card-actions align="end">
-        <button mat-button (click)="toggleAddForm()">Cancel</button>
-        <button mat-raised-button color="primary" (click)="createLuggage()">Create</button>
-      </mat-card-actions>
-    </mat-card>
+        
+        <div class="mb-3">
+          <label for="luggageDescription" class="form-label">Description</label>
+          <textarea 
+            class="form-control" 
+            id="luggageDescription"
+            [(ngModel)]="newLuggage.description" 
+            placeholder="Add some details about this luggage list" 
+            rows="3">
+          </textarea>
+        </div>
+      </div>
+      <div class="card-footer bg-transparent">
+        <div class="d-flex justify-content-end gap-2">
+          <button class="btn btn-outline-secondary" (click)="toggleAddForm()">Cancel</button>
+          <button class="btn btn-primary" (click)="createLuggage()">Create</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Loading State -->
-  <div class="loading-container" *ngIf="loading">
-    <mat-spinner diameter="40"></mat-spinner>
-    <p>Loading luggage lists...</p>
+  <div class="text-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary mb-3" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-muted">Loading luggage lists...</p>
   </div>
   
   <!-- Error State -->
-  <div class="error-container" *ngIf="error">
-    <mat-icon color="warn">error</mat-icon>
-    <p>Failed to load luggage lists. Please try again later.</p>
-    <button mat-stroked-button color="primary" (click)="loadLuggages()">
-      <mat-icon>refresh</mat-icon>
+  <div class="alert alert-danger text-center" *ngIf="error">
+    <i class="bi bi-exclamation-triangle fs-1 mb-3 d-block"></i>
+    <p class="mb-3">Failed to load luggage lists. Please try again later.</p>
+    <button class="btn btn-outline-primary" (click)="loadLuggages()">
+      <i class="bi bi-arrow-clockwise me-2"></i>
       Retry
     </button>
   </div>
 
   <!-- Empty State -->
-  <div class="empty-container" *ngIf="!loading && !error && luggages.length === 0">
-    <mat-icon>luggage</mat-icon>
-    <p>No luggage lists yet. Create one to start packing for your trip!</p>
-    <button mat-raised-button color="primary" (click)="toggleAddForm()">
-      <mat-icon>add</mat-icon>
+  <div class="text-center py-5" *ngIf="!loading && !error && luggages.length === 0">
+    <i class="bi bi-suitcase fs-1 text-muted mb-3 d-block"></i>
+    <p class="text-muted mb-3">No luggage lists yet. Create one to start packing for your trip!</p>
+    <button class="btn btn-primary" (click)="toggleAddForm()">
+      <i class="bi bi-plus-circle me-2"></i>
       Add Luggage List
     </button>
   </div>
 
   <!-- Luggage Lists -->
-  <div class="luggage-grid" *ngIf="!loading && !error && luggages.length > 0">
-    <mat-card *ngFor="let luggage of luggages" class="luggage-card">
-      <mat-card-header>
-        <div mat-card-avatar class="luggage-avatar">
-          <mat-icon>luggage</mat-icon>
+  <div class="row g-4" *ngIf="!loading && !error && luggages.length > 0">
+    <div class="col-lg-4 col-md-6" *ngFor="let luggage of luggages">
+      <div class="card h-100 shadow-sm">
+        <!-- Card Header -->
+        <div class="card-header bg-transparent border-bottom-0 pb-0">
+          <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" 
+                 style="width: 40px; height: 40px;">
+              <i class="bi bi-suitcase"></i>
+            </div>
+            <div class="flex-grow-1">
+              <h6 class="card-title mb-1">{{ luggage.name }}</h6>
+              <small class="text-muted" *ngIf="luggage.items">
+                {{ luggage.items.length }} items ({{ getPackedItemsCount(luggage.items) }} packed)
+              </small>
+            </div>
+          </div>
         </div>
-        <mat-card-title>{{ luggage.name }}</mat-card-title>
-        <mat-card-subtitle *ngIf="luggage.items">
-          {{ luggage.items.length }} items ({{ getPackedItemsCount(luggage.items) }} packed)
-        </mat-card-subtitle>
-      </mat-card-header>
-      
-      <mat-card-content *ngIf="luggage.description">
-        <p>{{ luggage.description }}</p>
-      </mat-card-content>
-      
-      <mat-card-actions align="end">
-        <button mat-button color="warn" (click)="deleteLuggage(luggage)">
-          <mat-icon>delete</mat-icon>
-          Delete
-        </button>
-      </mat-card-actions>
-
-      <mat-card-footer *ngIf="luggage.items?.length">
-        <mat-progress-bar 
-          mode="determinate" 
-          [value]="getPackingProgress(luggage.items)">
-        </mat-progress-bar>
-      </mat-card-footer>
-    </mat-card>
+        
+        <!-- Card Body -->
+        <div class="card-body" *ngIf="luggage.description">
+          <p class="card-text">{{ luggage.description }}</p>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="px-3 pb-2" *ngIf="luggage.items?.length">
+          <div class="progress" style="height: 6px;">
+            <div 
+              class="progress-bar bg-success" 
+              role="progressbar" 
+              [style.width.%]="getPackingProgress(luggage.items)"
+              [attr.aria-valuenow]="getPackingProgress(luggage.items)"
+              aria-valuemin="0" 
+              aria-valuemax="100">
+            </div>
+          </div>
+          <small class="text-muted">{{ getPackingProgress(luggage.items) | number:'1.0-0' }}% packed</small>
+        </div>
+        
+        <!-- Card Actions -->
+        <div class="card-footer bg-transparent border-top-0">
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-outline-danger btn-sm" (click)="deleteLuggage(luggage)">
+              <i class="bi bi-trash me-1"></i>
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

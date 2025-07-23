@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService, RegisterRequest } from '../../../services/auth.service';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-register',
@@ -18,7 +18,7 @@ export class RegisterComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -43,15 +43,11 @@ export class RegisterComponent implements OnInit {
     this.authService.register(registerRequest)
       .subscribe({
         next: () => {
-          this.snackBar.open('Registrazione completata con successo!', 'Chiudi', {
-            duration: 5000,
-          });
+          this.notificationService.showSuccess('Registrazione completata con successo!');
           this.router.navigate(['/trips']);
         },
         error: (error) => {
-          this.snackBar.open(error.error?.message || 'Si è verificato un errore durante la registrazione', 'Chiudi', {
-            duration: 5000,
-          });
+          this.notificationService.showError(error.error?.message || 'Si è verificato un errore durante la registrazione');
           this.isLoading = false;
         }
       });

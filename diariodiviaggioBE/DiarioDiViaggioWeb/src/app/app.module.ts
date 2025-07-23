@@ -10,29 +10,8 @@ import { AppComponent } from './app.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { SharedModule } from './components/shared/shared.module';
 
-// Material Modules
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatListModule } from '@angular/material/list';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatSelectModule } from '@angular/material/select';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatBadgeModule } from '@angular/material/badge';
-import { MatSliderModule } from '@angular/material/slider';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
+// ng-bootstrap import
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 // Components
 import { LoginComponent } from './components/auth/login/login.component';
@@ -70,29 +49,7 @@ import { RouterModule } from '@angular/router';
     CommonModule,
     AppRoutingModule,
     SharedModule,
-    // Material Modules
-    MatToolbarModule,
-    MatButtonModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatListModule,
-    MatTabsModule,
-    MatCheckboxModule,
-    MatSnackBarModule,
-    MatDialogModule,
-    MatSelectModule,
-    MatProgressSpinnerModule,
-    MatChipsModule,
-    MatMenuModule,
-    MatDividerModule,
-    MatExpansionModule,
-    MatBadgeModule,
-    MatSliderModule,
-    MatProgressBarModule
+    NgbModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

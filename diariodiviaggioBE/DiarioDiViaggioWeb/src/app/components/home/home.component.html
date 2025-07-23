@@ -1,61 +1,71 @@
-<div class="home-container">
-  <div class="hero">
-    <h1>Diario di Viaggio</h1>
-    <p class="tagline">Pianifica, condividi e ricorda ogni momento dei tuoi viaggi</p>
+<div class="container py-5">
+  <!-- Hero Section -->
+  <div class="text-center mb-5">
+    <h1 class="display-4 fw-bold text-primary mb-3">Diario di Viaggio</h1>
+    <p class="lead text-muted mb-4">Pianifica, condividi e ricorda ogni momento dei tuoi viaggi</p>
     
-    <div class="hero-actions">
-      <button mat-raised-button color="primary" routerLink="/trips" *ngIf="isLoggedIn()">
+    <div class="d-flex justify-content-center gap-3">
+      <button class="btn btn-primary btn-lg" routerLink="/trips" *ngIf="isLoggedIn()">
         I miei viaggi
       </button>
-      <button mat-raised-button color="primary" routerLink="/login" *ngIf="!isLoggedIn()">
+      <button class="btn btn-primary btn-lg" routerLink="/login" *ngIf="!isLoggedIn()">
         Inizia ora
       </button>
     </div>
   </div>
 
-  <div class="features">
-    <h2>Funzionalità principali</h2>
+  <!-- Features Section -->
+  <div class="mb-5">
+    <h2 class="text-center mb-5">Funzionalità principali</h2>
     
-    <div class="feature-grid">
-      <mat-card class="feature-card">
-        <mat-card-header>
-          <mat-icon mat-card-avatar>map</mat-icon>
-          <mat-card-title>Pianifica gli itinerari</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <p>Crea itinerari dettagliati per i tuoi viaggi, aggiungendo date, destinazioni e note.</p>
-        </mat-card-content>
-      </mat-card>
+    <div class="row g-4">
+      <div class="col-lg-3 col-md-6">
+        <div class="card h-100 shadow-sm text-center">
+          <div class="card-body">
+            <div class="mb-3">
+              <i class="bi bi-map fs-1 text-primary"></i>
+            </div>
+            <h5 class="card-title">Pianifica gli itinerari</h5>
+            <p class="card-text">Crea itinerari dettagliati per i tuoi viaggi, aggiungendo date, destinazioni e note.</p>
+          </div>
+        </div>
+      </div>
       
-      <mat-card class="feature-card">
-        <mat-card-header>
-          <mat-icon mat-card-avatar>photo_camera</mat-icon>
-          <mat-card-title>Aggiungi foto e ricordi</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <p>Salva foto, annotazioni e recensioni di ristoranti, hotel e attrazioni visitate.</p>
-        </mat-card-content>
-      </mat-card>
+      <div class="col-lg-3 col-md-6">
+        <div class="card h-100 shadow-sm text-center">
+          <div class="card-body">
+            <div class="mb-3">
+              <i class="bi bi-camera fs-1 text-primary"></i>
+            </div>
+            <h5 class="card-title">Aggiungi foto e ricordi</h5>
+            <p class="card-text">Salva foto, annotazioni e recensioni di ristoranti, hotel e attrazioni visitate.</p>
+          </div>
+        </div>
+      </div>
       
-      <mat-card class="feature-card">
-        <mat-card-header>
-          <mat-icon mat-card-avatar>luggage</mat-icon>
-          <mat-card-title>Gestisci il bagaglio</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <p>Crea liste di bagagli personalizzate per ogni viaggio e tieni traccia di ciò che hai già preparato.</p>
-        </mat-card-content>
-      </mat-card>
+      <div class="col-lg-3 col-md-6">
+        <div class="card h-100 shadow-sm text-center">
+          <div class="card-body">
+            <div class="mb-3">
+              <i class="bi bi-suitcase fs-1 text-primary"></i>
+            </div>
+            <h5 class="card-title">Gestisci il bagaglio</h5>
+            <p class="card-text">Crea liste di bagagli personalizzate per ogni viaggio e tieni traccia di ciò che hai già preparato.</p>
+          </div>
+        </div>
+      </div>
       
-      <mat-card class="feature-card">
-        <mat-card-header>
-          <mat-icon mat-card-avatar>group</mat-icon>
-          <mat-card-title>Condividi con gli amici</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <p>Condividi i tuoi viaggi con amici e familiari tramite un semplice codice di condivisione.</p>
-        </mat-card-content>
-      </mat-card>
+      <div class="col-lg-3 col-md-6">
+        <div class="card h-100 shadow-sm text-center">
+          <div class="card-body">
+            <div class="mb-3">
+              <i class="bi bi-people fs-1 text-primary"></i>
+            </div>
+            <h5 class="card-title">Condividi con gli amici</h5>
+            <p class="card-text">Condividi i tuoi viaggi con amici e familiari tramite un semplice codice di condivisione.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

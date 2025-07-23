@@ -1,22 +1,39 @@
 <!-- filepath: c:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\DiarioDiViaggioWeb\src\app\app.component.html -->
-<mat-toolbar color="primary">
-  <span routerLink="/" class="site-logo">Diario di Viaggio</span>
-  <span class="spacer"></span>
-  <ng-container *ngIf="isLoggedIn(); else notLoggedIn">
-    <button mat-button routerLink="/trips">I miei viaggi</button>
-    <button mat-button [matMenuTriggerFor]="userMenu">
-      {{ currentUser?.username }}
-      <mat-icon>arrow_drop_down</mat-icon>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/">Diario di Viaggio</a>
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
     </button>
-    <mat-menu #userMenu="matMenu">
-      <button mat-menu-item (click)="logout()">Logout</button>
-    </mat-menu>
-  </ng-container>
-  <ng-template #notLoggedIn>
-    <button mat-button routerLink="/login">Login</button>
-    <button mat-button routerLink="/register">Registrati</button>
-  </ng-template>
-</mat-toolbar>
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <ng-container *ngIf="isLoggedIn(); else notLoggedIn">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/trips">I miei viaggi</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {{ currentUser?.username }}
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" (click)="logout()">Logout</a></li>
+            </ul>
+          </li>
+        </ng-container>
+        <ng-template #notLoggedIn>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/register">Registrati</a>
+          </li>
+        </ng-template>
+      </ul>
+    </div>
+  </div>
+</nav>
 
 <div class="content-container">
   <router-outlet></router-outlet>

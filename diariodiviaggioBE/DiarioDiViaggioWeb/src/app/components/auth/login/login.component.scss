@@ -2,30 +2,32 @@
   display: flex;
   justify-content: center;
   padding: 40px 16px;
+  min-height: calc(100vh - 200px);
+  align-items: center;
 }
 
-mat-card {
+.card {
   width: 100%;
   max-width: 400px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.full-width {
-  width: 100%;
-  margin-bottom: 16px;
+.card-header {
+  background-color: var(--bs-primary);
+  color: white;
 }
 
-.form-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 24px;
+.form-label {
+  font-weight: 500;
 }
 
-button[type="submit"] {
+.btn {
   min-width: 120px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+}
+
+.input-group .btn {
+  min-width: auto;
+  width: 48px;
 }
 
 mat-spinner {

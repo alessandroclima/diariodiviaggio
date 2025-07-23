@@ -1,60 +1,65 @@
-<div class="trip-list-container">
-  <div class="header">
-    <h1>I miei viaggi</h1>
-    <button mat-raised-button color="primary" routerLink="/trips/new">
-      <mat-icon>add</mat-icon>
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">I miei viaggi</h1>
+    <button class="btn btn-primary" routerLink="/trips/new">
+      <i class="bi bi-plus-circle me-2"></i>
       Nuovo viaggio
     </button>
   </div>
 
-  <div *ngIf="isLoading" class="loading-container">
-    <mat-spinner diameter="40"></mat-spinner>
+  <div *ngIf="isLoading" class="d-flex justify-content-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
   </div>
 
-  <div *ngIf="!isLoading && trips.length === 0" class="empty-state">
-    <mat-icon>flight</mat-icon>
+  <div *ngIf="!isLoading && trips.length === 0" class="text-center py-5 bg-light rounded">
+    <i class="bi bi-airplane display-1 text-primary mb-3"></i>
     <h2>Nessun viaggio trovato</h2>
-    <p>Inizia a creare il tuo primo viaggio</p>
-    <button mat-raised-button color="primary" routerLink="/trips/new">
-      <mat-icon style="color: white;">add</mat-icon>
+    <p class="text-muted mb-4">Inizia a creare il tuo primo viaggio</p>
+    <button class="btn btn-primary" routerLink="/trips/new">
+      <i class="bi bi-plus-circle me-2"></i>
       Nuovo viaggio
     </button>
   </div>
 
-  <div *ngIf="!isLoading && trips.length > 0" class="trips-grid">
-    <mat-card *ngFor="let trip of trips" class="trip-card" [routerLink]="['/trips', trip.id]">
-      <mat-card-header>
-        <mat-card-title>{{ trip.title }}</mat-card-title>
-        <mat-card-subtitle>
-          {{ trip.startDate | date:'dd/MM/yyyy' }} - {{ trip.endDate ? (trip.endDate | date:'dd/MM/yyyy') : 'In corso' }}
-        </mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <p *ngIf="trip.description">{{ trip.description }}</p>
-        <div class="trip-meta">
-          <div>
-            <mat-icon>person</mat-icon>
-            <span>{{ trip.ownerUsername }}</span>
-          </div>
-          <div *ngIf="trip.sharedWithUsernames.length > 0">
-            <mat-icon>group</mat-icon>
-            <span>Condiviso con {{ trip.sharedWithUsernames.length }} persone</span>
+  <div *ngIf="!isLoading && trips.length > 0" class="row g-4 mb-5">
+    <div *ngFor="let trip of trips" class="col-md-6 col-lg-4">
+      <div class="card h-100 trip-card" [routerLink]="['/trips', trip.id]" role="button">
+        <div class="card-header">
+          <h5 class="card-title mb-1">{{ trip.title }}</h5>
+          <small class="text-muted">
+            {{ trip.startDate | date:'dd/MM/yyyy' }} - {{ trip.endDate ? (trip.endDate | date:'dd/MM/yyyy') : 'In corso' }}
+          </small>
+        </div>
+        <div class="card-body">
+          <p *ngIf="trip.description" class="card-text">{{ trip.description }}</p>
+          <div class="trip-meta">
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-person me-2 text-muted"></i>
+              <small class="text-muted">{{ trip.ownerUsername }}</small>
+            </div>
+            <div *ngIf="trip.sharedWithUsernames.length > 0" class="d-flex align-items-center">
+              <i class="bi bi-people me-2 text-muted"></i>
+              <small class="text-muted">Condiviso con {{ trip.sharedWithUsernames.length }} persone</small>
+            </div>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
   </div>
 
-  <div class="join-trip-container">
-    <h2>Unisciti a un viaggio</h2>
-    <div class="join-trip-form">
-      <mat-form-field appearance="outline">
-        <mat-label>Codice di condivisione</mat-label>
-        <input matInput [(ngModel)]="shareCode" placeholder="Inserisci il codice">
-      </mat-form-field>
-      <button mat-raised-button color="primary" [disabled]="!shareCode" (click)="joinTrip()">
-        Unisciti
-      </button>
+  <div class="border-top pt-4">
+    <h2 class="h4 mb-3">Unisciti a un viaggio</h2>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="input-group">
+          <input type="text" class="form-control" [(ngModel)]="shareCode" placeholder="Inserisci il codice di condivisione">
+          <button class="btn btn-primary" [disabled]="!shareCode" (click)="joinTrip()">
+            Unisciti
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
