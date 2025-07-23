@@ -40,7 +40,7 @@ export class TripDetailComponent implements OnInit {
     this.tripForm = this.fb.group({
       title: ['', Validators.required],
       description: [''],
-      startDate: [new Date(), Validators.required],
+      startDate: [new Date().toISOString().split('T')[0], Validators.required],
       endDate: [null]
     });
   }
@@ -54,8 +54,8 @@ export class TripDetailComponent implements OnInit {
           this.tripForm.patchValue({
             title: trip.title,
             description: trip.description,
-            startDate: new Date(trip.startDate),
-            endDate: trip.endDate ? new Date(trip.endDate) : null
+            startDate: this.formatDateForInput(trip.startDate),
+            endDate: trip.endDate ? this.formatDateForInput(trip.endDate) : null
           });
           this.isLoading = false;
         },
@@ -69,14 +69,14 @@ export class TripDetailComponent implements OnInit {
 
   saveTrip(): void {
     if (this.tripForm.invalid) return;
-
+    console.log('Saving trip:', this.tripForm.value);
     this.isSaving = true;
 
     if (this.isEditMode && this.tripId) {
       const updateRequest: UpdateTripRequest = {
         ...this.tripForm.value,
-        startDate: this.formatDate(this.tripForm.value.startDate),
-        endDate: this.tripForm.value.endDate ? this.formatDate(this.tripForm.value.endDate) : undefined
+        startDate: this.formatDate(new Date(this.tripForm.value.startDate)),
+        endDate: this.tripForm.value.endDate ? this.formatDate(new Date(this.tripForm.value.endDate)) : undefined
       };
 
       this.tripService.updateTrip(this.tripId, updateRequest)
@@ -139,5 +139,10 @@ export class TripDetailComponent implements OnInit {
 
   private formatDate(date: Date): string {
     return date.toISOString();
+  }
+
+  private formatDateForInput(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
   }
 }
