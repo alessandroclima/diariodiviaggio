@@ -8,6 +8,7 @@ import { TripDetailComponent } from './components/trip/trip-detail/trip-detail.c
 import { TripItemListComponent } from './components/trip-item/trip-item-list/trip-item-list.component';
 import { TripItemFormComponent } from './components/trip-item/trip-item-form/trip-item-form.component';
 import { LuggageListComponent } from './components/luggage/luggage-list/luggage-list.component';
+import { LuggageDetailComponent } from './components/luggage/luggage-detail/luggage-detail.component';
 
 import { AuthGuard } from './guards/auth.guard';
 
@@ -23,6 +24,7 @@ const routes: Routes = [
   { path: 'trips/:tripId/items/new', component: TripItemFormComponent, canActivate: [AuthGuard] },
   { path: 'trips/:tripId/items/:id', component: TripItemFormComponent, canActivate: [AuthGuard] },
   { path: 'trips/:tripId/luggage', component: LuggageListComponent, canActivate: [AuthGuard] },
+  { path: 'trips/:tripId/luggage/:luggageId', component: LuggageDetailComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '' }
 ];
 

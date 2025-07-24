@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TripItem, TripItemService } from '../../../services/trip-item.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
@@ -10,7 +11,7 @@ import { NotificationService } from '../../../services/notification.service';
   styleUrls: ['./trip-item-list.component.scss']
 })
 export class TripItemListComponent implements OnInit {
-  @Input('tripId') tripId!: number;
+  tripId!: number;
   
   tripItems: TripItem[] = [];
   loading = true;
@@ -20,21 +21,31 @@ export class TripItemListComponent implements OnInit {
   editingItem: TripItem | null = null;
   
   activeFilters: { [key: string]: boolean } = {
-    restaurant: true,
-    hotel: true,
-    attraction: true,
-    note: true
+    Restaurant: true,
+    Hotel: true,
+    Attraction: true,
+    Note: true
   };
 
   constructor(
+    private route: ActivatedRoute,
     private tripItemService: TripItemService,
     private modal: NgbModal,
     private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
-    console.log('TripItemListComponent initialized with tripId:', this.tripId);
-    this.loadTripItems();
+    // Get tripId from route params instead of @Input
+    const tripIdParam = this.route.snapshot.paramMap.get('tripId');
+    if (tripIdParam) {
+      this.tripId = +tripIdParam;
+      console.log('TripItemListComponent initialized with tripId from route:', this.tripId);
+      this.loadTripItems();
+    } else {
+      console.error('No tripId found in route params');
+      this.error = true;
+      this.loading = false;
+    }
   }
 
   loadTripItems(): void {
@@ -43,6 +54,7 @@ export class TripItemListComponent implements OnInit {
     
     this.tripItemService.getTripItems(this.tripId).subscribe({
       next: (items) => {
+        console.log('Loaded trip items:', items);
         this.tripItems = items;
         this.loading = false;
       },
@@ -114,19 +126,31 @@ export class TripItemListComponent implements OnInit {
   }
 
   isItemVisible(item: TripItem): boolean {
-    return this.activeFilters[item.type];
+    const visible = this.activeFilters[item.type];
+    console.log(`isItemVisible - item.type: ${item.type}, activeFilters[${item.type}]: ${visible}`);
+    return visible;
   }
 
   getFilteredItems(): TripItem[] {
-    return this.tripItems.filter(item => this.isItemVisible(item));
+    console.log('getFilteredItems called');
+    console.log('tripItems:', this.tripItems);
+    console.log('activeFilters:', this.activeFilters);
+    
+    const filtered = this.tripItems.filter(item => {
+      console.log(`Item: ${item.title}, Type: ${item.type}, Visible: ${this.isItemVisible(item)}`);
+      return this.isItemVisible(item);
+    });
+    
+    console.log('Filtered items:', filtered);
+    return filtered;
   }
 
   getTypeIcon(type: string): string {
     switch (type) {
-      case 'restaurant': return 'bi-shop';
-      case 'hotel': return 'bi-house';
-      case 'attraction': return 'bi-geo-alt';
-      case 'note': return 'bi-sticky';
+      case 'Restaurant': return 'bi-shop';
+      case 'Hotel': return 'bi-house';
+      case 'Attraction': return 'bi-geo-alt';
+      case 'Note': return 'bi-sticky';
       default: return 'bi-file-text';
     }
   }

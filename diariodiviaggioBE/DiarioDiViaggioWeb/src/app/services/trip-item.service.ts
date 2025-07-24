@@ -29,6 +29,8 @@ export interface UpdateTripItemRequest {
   description?: string;
   location?: string;
   rating?: number;
+  image?: File;
+  removeImage?: boolean;
 }
 
 @Injectable({
@@ -60,7 +62,25 @@ export class TripItemService {
   }
 
   updateTripItem(id: number, request: UpdateTripItemRequest): Observable<TripItem> {
-    return this.http.put<TripItem>(`${this.apiUrl}/${id}`, request);
+    const formData = new FormData();
+    formData.append('title', request.title);
+    if (request.description) {
+      formData.append('description', request.description);
+    }
+    if (request.location) {
+      formData.append('location', request.location);
+    }
+    if (request.rating) {
+      formData.append('rating', request.rating.toString());
+    }
+    if (request.image) {
+      formData.append('image', request.image, request.image.name);
+    }
+    if (request.removeImage) {
+      formData.append('removeImage', 'true');
+    }
+
+    return this.http.put<TripItem>(`${this.apiUrl}/${id}`, formData);
   }
 
   getTripItem(id: number): Observable<TripItem> {

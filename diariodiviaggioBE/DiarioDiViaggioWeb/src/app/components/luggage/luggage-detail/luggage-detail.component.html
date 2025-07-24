@@ -1,0 +1,176 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center mb-4">
+    <button class="btn btn-outline-secondary me-3" (click)="goBack()">
+      <i class="bi bi-arrow-left"></i>
+    </button>
+    <div class="flex-grow-1">
+      <h2 class="mb-1">{{ luggage?.name || 'Luggage Details' }}</h2>
+      <p class="text-muted mb-0" *ngIf="luggage?.description">{{ luggage?.description }}</p>
+    </div>
+    <button 
+      class="btn btn-primary" 
+      (click)="toggleAddForm()" 
+      *ngIf="!showAddForm">
+      <i class="bi bi-plus-circle me-2"></i>
+      Add Item
+    </button>
+  </div>
+
+  <!-- Progress Overview -->
+  <div class="row mb-4" *ngIf="luggage && luggage.items.length > 0">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="card-title mb-0">Packing Progress</h6>
+            <span class="badge bg-primary">{{ getPackedItemsCount() }} / {{ luggage?.items?.length || 0 }} items</span>
+          </div>
+          <div class="progress mb-2" style="height: 12px;">
+            <div 
+              class="progress-bar bg-success" 
+              role="progressbar" 
+              [style.width.%]="getPackingProgress()"
+              [attr.aria-valuenow]="getPackingProgress()"
+              aria-valuemin="0" 
+              aria-valuemax="100">
+            </div>
+          </div>
+          <small class="text-muted">{{ Math.round(getPackingProgress()) }}% complete</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Item Form -->
+  <div class="mb-4" *ngIf="showAddForm">
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h5 class="card-title mb-0">{{ editingItem ? 'Edit Item' : 'Add New Item' }}</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="itemName" class="form-label">Item Name *</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="itemName"
+                [(ngModel)]="itemName" 
+                placeholder="e.g. T-shirts, Toothbrush, Camera"
+                required>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="mb-3">
+              <label for="quantity" class="form-label">Quantity *</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                id="quantity"
+                [(ngModel)]="itemQuantity" 
+                min="1"
+                required>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="notes" class="form-label">Notes</label>
+          <textarea 
+            class="form-control" 
+            id="notes"
+            [(ngModel)]="itemNotes" 
+            placeholder="Additional notes about this item"
+            rows="2">
+          </textarea>
+        </div>
+      </div>
+      <div class="card-footer bg-transparent">
+        <div class="d-flex justify-content-end gap-2">
+          <button class="btn btn-outline-secondary" (click)="toggleAddForm()">Cancel</button>
+          <button class="btn btn-primary" (click)="saveItem()" [disabled]="!itemName.trim() || isSaving">
+            <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status"></span>
+            {{ editingItem ? 'Update' : 'Add Item' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="text-center py-5" *ngIf="isLoading">
+    <div class="spinner-border text-primary mb-3" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-muted">Loading luggage details...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="text-center py-5" *ngIf="!isLoading && luggage && luggage.items.length === 0">
+    <i class="bi bi-archive fs-1 text-muted mb-3 d-block"></i>
+    <p class="text-muted mb-3">No items in this luggage list yet.</p>
+    <button class="btn btn-primary" (click)="toggleAddForm()">
+      <i class="bi bi-plus-circle me-2"></i>
+      Add Your First Item
+    </button>
+  </div>
+
+  <!-- Items List -->
+  <div class="row g-3" *ngIf="!isLoading && luggage && luggage.items.length > 0">
+    <div class="col-12" *ngFor="let item of luggage.items">
+      <div class="card shadow-sm" [class.border-success]="item.isPacked">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <!-- Checkbox -->
+            <div class="col-auto">
+              <div class="form-check">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  [id]="'item-' + item.id"
+                  [checked]="item.isPacked"
+                  (change)="toggleItemPacked(item)">
+                <label class="form-check-label" [for]="'item-' + item.id"></label>
+              </div>
+            </div>
+            
+            <!-- Item Details -->
+            <div class="col">
+              <div class="d-flex align-items-center">
+                <h6 class="mb-1 me-2" [class.text-decoration-line-through]="item.isPacked">
+                  {{ item.name }}
+                </h6>
+                <span class="badge bg-secondary me-2" *ngIf="item.quantity > 1">
+                  {{ item.quantity }}x
+                </span>
+                <span class="badge bg-success" *ngIf="item.isPacked">
+                  <i class="bi bi-check-circle me-1"></i>Packed
+                </span>
+              </div>
+              <p class="text-muted mb-0 small" *ngIf="item.notes">{{ item.notes }}</p>
+            </div>
+            
+            <!-- Actions -->
+            <div class="col-auto">
+              <div class="btn-group" role="group">
+                <button 
+                  class="btn btn-outline-primary btn-sm" 
+                  (click)="editItem(item)"
+                  title="Edit item">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button 
+                  class="btn btn-outline-danger btn-sm" 
+                  (click)="deleteItem(item)"
+                  title="Delete item">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

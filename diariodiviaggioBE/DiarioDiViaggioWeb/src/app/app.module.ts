@@ -21,6 +21,7 @@ import { TripDetailComponent } from './components/trip/trip-detail/trip-detail.c
 import { TripItemListComponent } from './components/trip-item/trip-item-list/trip-item-list.component';
 import { TripItemFormComponent } from './components/trip-item/trip-item-form/trip-item-form.component';
 import { LuggageListComponent } from './components/luggage/luggage-list/luggage-list.component';
+import { LuggageDetailComponent } from './components/luggage/luggage-detail/luggage-detail.component';
 import { HomeComponent } from './components/home/home.component';
 
 // Pipes
@@ -37,6 +38,7 @@ import { RouterModule } from '@angular/router';
     TripItemListComponent,
     TripItemFormComponent,
     LuggageListComponent,
+    LuggageDetailComponent,
     HomeComponent,
     FilterByPipe
   ],

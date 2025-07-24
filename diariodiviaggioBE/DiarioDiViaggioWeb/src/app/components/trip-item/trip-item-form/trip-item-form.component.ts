@@ -18,6 +18,7 @@ export class TripItemFormComponent implements OnInit {
   tripItemForm!: FormGroup;
   selectedFile: File | null = null;
   imagePreview: string | ArrayBuffer | null = null;
+  imageRemoved = false;
   isEdit = false;
   isSubmitting = false;
   
@@ -55,7 +56,7 @@ export class TripItemFormComponent implements OnInit {
     this.tripItemForm = this.fb.group({
       title: [this.tripItem?.title || '', [Validators.required, Validators.maxLength(100)]],
       description: [this.tripItem?.description || ''],
-      type: [this.tripItem?.type || 'note', [Validators.required]],
+      type: [this.tripItem?.type?.toLowerCase() || 'note', [Validators.required]],
       location: [this.tripItem?.location || ''],
       rating: [this.tripItem?.rating || null]
     });
@@ -69,6 +70,7 @@ export class TripItemFormComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
       this.selectedFile = input.files[0];
+      this.imageRemoved = false;
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreview = reader.result;
@@ -80,6 +82,7 @@ export class TripItemFormComponent implements OnInit {
   removeImage(): void {
     this.selectedFile = null;
     this.imagePreview = null;
+    this.imageRemoved = true;
   }
 
   onSubmit(): void {
@@ -124,7 +127,9 @@ export class TripItemFormComponent implements OnInit {
       title: this.tripItemForm.value.title,
       description: this.tripItemForm.value.description,
       location: this.tripItemForm.value.location,
-      rating: this.tripItemForm.value.rating
+      rating: this.tripItemForm.value.rating,
+      image: this.selectedFile || undefined,
+      removeImage: this.imageRemoved
     };
     
     this.tripItemService.updateTripItem(this.tripItem.id, request).subscribe({

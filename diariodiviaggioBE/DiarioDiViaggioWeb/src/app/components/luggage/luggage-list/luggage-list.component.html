@@ -117,15 +117,19 @@
           <small class="text-muted">{{ getPackingProgress(luggage.items) | number:'1.0-0' }}% packed</small>
         </div>
         
-        <!-- Card Actions -->
-        <div class="card-footer bg-transparent border-top-0">
-          <div class="d-flex justify-content-end">
-            <button class="btn btn-outline-danger btn-sm" (click)="deleteLuggage(luggage)">
-              <i class="bi bi-trash me-1"></i>
-              Delete
-            </button>
+                  <!-- Card Actions -->
+          <div class="card-footer bg-transparent border-top-0">
+            <div class="d-flex justify-content-between">
+              <button class="btn btn-outline-primary btn-sm" (click)="navigateToLuggageDetail(luggage)">
+                <i class="bi bi-list-check me-1"></i>
+                Manage Items
+              </button>
+              <button class="btn btn-outline-danger btn-sm" (click)="deleteLuggage(luggage)">
+                <i class="bi bi-trash me-1"></i>
+                Delete
+              </button>
+            </div>
           </div>
-        </div>
       </div>
     </div>
   </div>

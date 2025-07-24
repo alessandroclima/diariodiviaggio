@@ -1,0 +1,57 @@
+.luggage-detail {
+  .progress-overview {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .item-card {
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.packed {
+      background-color: #f8f9fa;
+      border-left: 4px solid #28a745;
+    }
+  }
+
+  .form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+  }
+
+  .add-item-form {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+  }
+
+  .empty-state {
+    i {
+      font-size: 4rem;
+      opacity: 0.5;
+    }
+  }
+
+  .item-actions {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  .item-card:hover .item-actions {
+    opacity: 1;
+  }
+
+  .badge {
+    font-size: 0.75em;
+  }
+
+  @media (max-width: 768px) {
+    .item-actions {
+      opacity: 1;
+    }
+  }
+}

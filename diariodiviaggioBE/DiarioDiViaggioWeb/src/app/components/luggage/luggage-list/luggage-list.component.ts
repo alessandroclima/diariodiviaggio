@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Luggage, LuggageService, CreateLuggageRequest } from '../../../services/luggage.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
@@ -23,6 +24,7 @@ export class LuggageListComponent implements OnInit {
   };
 
   constructor(
+    private router: Router,
     private luggageService: LuggageService,
     private modal: NgbModal,
     private notificationService: NotificationService
@@ -111,5 +113,9 @@ export class LuggageListComponent implements OnInit {
   getPackingProgress(items: any[]): number {
     if (!items || items.length === 0) return 0;
     return (this.getPackedItemsCount(items) / items.length) * 100;
+  }
+
+  navigateToLuggageDetail(luggage: Luggage): void {
+    this.router.navigate(['/trips', this.tripId, 'luggage', luggage.id]);
   }
 }
