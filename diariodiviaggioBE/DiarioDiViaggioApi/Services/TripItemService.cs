@@ -9,7 +9,6 @@ public class TripItemService : ITripItemService
 {
     private readonly ApplicationDbContext _context;
     private readonly IWebHostEnvironment _environment;
-    private readonly string _uploadDirectory = "uploads";
 
     public TripItemService(ApplicationDbContext context, IWebHostEnvironment environment)
     {
@@ -28,10 +27,10 @@ public class TripItemService : ITripItemService
             throw new InvalidOperationException("Trip not found or you don't have access to it");
         }
 
-        string? imagePath = null;
+        byte[]? imageData = null;
         if (createDto.Image != null)
         {
-            imagePath = await SaveImageAsync(tripId, createDto.Image);
+            imageData = await ConvertImageToByteArrayAsync(createDto.Image);
         }
 
         var tripItem = new TripItem
@@ -42,7 +41,7 @@ public class TripItemService : ITripItemService
             Type = Enum.Parse<ItemType>(createDto.Type),
             Location = createDto.Location,
             Rating = createDto.Rating,
-            ImagePath = imagePath,
+            ImageData = imageData,
             CreatedById = userId
         };
 
@@ -67,6 +66,16 @@ public class TripItemService : ITripItemService
         tripItem.Description = updateDto.Description ?? tripItem.Description;
         tripItem.Location = updateDto.Location ?? tripItem.Location;
         tripItem.Rating = updateDto.Rating ?? tripItem.Rating;
+
+        // Handle image updates
+        if (updateDto.RemoveImage)
+        {
+            tripItem.ImageData = null;
+        }
+        else if (updateDto.Image != null)
+        {
+            tripItem.ImageData = await ConvertImageToByteArrayAsync(updateDto.Image);
+        }
 
         await _context.SaveChangesAsync();
 
@@ -121,33 +130,18 @@ public class TripItemService : ITripItemService
             throw new InvalidOperationException("Trip item not found or you don't have access to it");
         }
 
-        if (tripItem.ImagePath != null)
-        {
-            var fullPath = Path.Combine(_environment.WebRootPath, tripItem.ImagePath);
-            if (File.Exists(fullPath))
-            {
-                File.Delete(fullPath);
-            }
-        }
-
+        // No need to delete files since image is stored in database
         _context.TripItems.Remove(tripItem);
         await _context.SaveChangesAsync();
     }
 
-    public async Task<string> SaveImageAsync(int tripId, IFormFile image)
+    public async Task<byte[]> ConvertImageToByteArrayAsync(IFormFile image)
     {
-        var uploadsFolder = Path.Combine(_environment.WebRootPath, _uploadDirectory, tripId.ToString());
-        Directory.CreateDirectory(uploadsFolder);
-
-        var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
-        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-        using (var fileStream = new FileStream(filePath, FileMode.Create))
+        using (var memoryStream = new MemoryStream())
         {
-            await image.CopyToAsync(fileStream);
+            await image.CopyToAsync(memoryStream);
+            return memoryStream.ToArray();
         }
-
-        return Path.Combine(_uploadDirectory, tripId.ToString(), uniqueFileName);
     }
 
     private async Task<bool> HasAccessToTrip(int tripId, int userId)
@@ -162,9 +156,10 @@ public class TripItemService : ITripItemService
         await _context.Entry(item).Reference(ti => ti.CreatedBy).LoadAsync();
 
         string? imageUrl = null;
-        if (item.ImagePath != null)
+        if (item.ImageData != null)
         {
-            imageUrl = $"/api/tripitem/image/{item.ImagePath}";
+            var base64String = Convert.ToBase64String(item.ImageData);
+            imageUrl = base64String;
         }
 
         return new TripItemResponseDto

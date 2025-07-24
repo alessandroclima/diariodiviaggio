@@ -53,6 +53,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable static files for serving uploaded images
+app.UseStaticFiles();
+
 app.UseCors(options =>
 {
     options.AllowAnyHeader();

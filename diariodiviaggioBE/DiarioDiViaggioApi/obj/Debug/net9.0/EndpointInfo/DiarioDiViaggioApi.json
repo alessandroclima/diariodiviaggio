@@ -943,19 +943,54 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateTripItemDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateTripItemDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateTripItemDto"
+                "required": [
+                  "Title"
+                ],
+                "type": "object",
+                "properties": {
+                  "Title": {
+                    "type": "string"
+                  },
+                  "Description": {
+                    "type": "string"
+                  },
+                  "Location": {
+                    "type": "string"
+                  },
+                  "Rating": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "Image": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "RemoveImage": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "encoding": {
+                "Title": {
+                  "style": "form"
+                },
+                "Description": {
+                  "style": "form"
+                },
+                "Location": {
+                  "style": "form"
+                },
+                "Rating": {
+                  "style": "form"
+                },
+                "Image": {
+                  "style": "form"
+                },
+                "RemoveImage": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -1395,32 +1430,6 @@
           "endDate": {
             "type": "string",
             "format": "date-time",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "UpdateTripItemDto": {
-        "required": [
-          "title"
-        ],
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "nullable": true
-          },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "location": {
-            "type": "string",
-            "nullable": true
-          },
-          "rating": {
-            "type": "integer",
-            "format": "int32",
             "nullable": true
           }
         },

@@ -32,7 +32,7 @@ public class TripItem
 
     public string Description { get; set; } = string.Empty;
 
-    public string? ImagePath { get; set; }
+    public byte[]? ImageData { get; set; }
 
     public string? Location { get; set; }
 

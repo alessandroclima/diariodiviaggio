@@ -16,6 +16,8 @@ public class UpdateTripItemDto
     public string? Description { get; set; }
     public string? Location { get; set; }
     public int? Rating { get; set; }
+    public IFormFile? Image { get; set; }
+    public bool RemoveImage { get; set; } = false;
 }
 
 public class TripItemResponseDto

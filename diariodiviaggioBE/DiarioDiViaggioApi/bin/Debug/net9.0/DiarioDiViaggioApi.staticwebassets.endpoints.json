@@ -1,5 +1,170 @@
 {
   "Version": 1,
   "ManifestType": "Build",
-  "Endpoints": []
+  "Endpoints": [
+    {
+      "Route": "uploads/.6eumd0rce8.gitkeep",
+      "AssetFile": "uploads/.gitkeep",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "71"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/octet-stream"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"ot/S8ZeAgH7t7QIQzaDLdCw/+tVHH+mPIS4GcjEt79s=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 24 Jul 2025 12:36:10 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "6eumd0rce8"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-ot/S8ZeAgH7t7QIQzaDLdCw/+tVHH+mPIS4GcjEt79s="
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/.gitkeep"
+        }
+      ]
+    },
+    {
+      "Route": "uploads/.gitkeep",
+      "AssetFile": "uploads/.gitkeep",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "71"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/octet-stream"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"ot/S8ZeAgH7t7QIQzaDLdCw/+tVHH+mPIS4GcjEt79s=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 24 Jul 2025 12:36:10 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-ot/S8ZeAgH7t7QIQzaDLdCw/+tVHH+mPIS4GcjEt79s="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/1/15a98a75-5b30-4fdf-a091-0ee4c0cea7c7.jpg",
+      "AssetFile": "uploads/1/15a98a75-5b30-4fdf-a091-0ee4c0cea7c7.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "10125"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"Nz+A31BxghQ1CuLxPZ3+qx6wmIET6FEV2pwwXYfVYwA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 24 Jul 2025 12:37:53 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-Nz+A31BxghQ1CuLxPZ3+qx6wmIET6FEV2pwwXYfVYwA="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/1/15a98a75-5b30-4fdf-a091-0ee4c0cea7c7.vq3xqle47v.jpg",
+      "AssetFile": "uploads/1/15a98a75-5b30-4fdf-a091-0ee4c0cea7c7.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "10125"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"Nz+A31BxghQ1CuLxPZ3+qx6wmIET6FEV2pwwXYfVYwA=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 24 Jul 2025 12:37:53 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "vq3xqle47v"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-Nz+A31BxghQ1CuLxPZ3+qx6wmIET6FEV2pwwXYfVYwA="
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/1/15a98a75-5b30-4fdf-a091-0ee4c0cea7c7.jpg"
+        }
+      ]
+    }
+  ]
 }

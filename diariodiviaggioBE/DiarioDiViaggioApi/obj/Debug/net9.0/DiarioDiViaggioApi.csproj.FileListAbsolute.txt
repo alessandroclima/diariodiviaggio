@@ -135,10 +135,11 @@ C:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\Di
 C:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\DiarioDiViaggioApi\obj\Debug\net9.0\staticwebassets\msbuild.buildMultiTargeting.DiarioDiViaggioApi.props
 C:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\DiarioDiViaggioApi\obj\Debug\net9.0\staticwebassets\msbuild.buildTransitive.DiarioDiViaggioApi.props
 C:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\DiarioDiViaggioApi\obj\Debug\net9.0\staticwebassets.pack.json
-C:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\DiarioDiViaggioApi\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 C:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\DiarioDiViaggioApi\obj\Debug\net9.0\DiarioDi.236F1EDD.Up2Date
 C:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\DiarioDiViaggioApi\obj\Debug\net9.0\DiarioDiViaggioApi.dll
 C:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\DiarioDiViaggioApi\obj\Debug\net9.0\refint\DiarioDiViaggioApi.dll
 C:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\DiarioDiViaggioApi\obj\Debug\net9.0\DiarioDiViaggioApi.pdb
 C:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\DiarioDiViaggioApi\obj\Debug\net9.0\DiarioDiViaggioApi.genruntimeconfig.cache
 C:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\DiarioDiViaggioApi\obj\Debug\net9.0\ref\DiarioDiViaggioApi.dll
+C:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\DiarioDiViaggioApi\bin\Debug\net9.0\DiarioDiViaggioApi.staticwebassets.runtime.json
+C:\Users\aless\source\repos\diariodiviaggio\diariodiviaggio\diariodiviaggioBE\DiarioDiViaggioApi\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

@@ -116,7 +116,7 @@
           </div>
 
           <!-- Card Image -->
-          <img class="card-img-top" *ngIf="item.imageUrl" [src]="item.imageUrl" [alt]="item.title" style="height: 200px; object-fit: cover;">
+          <img class="card-img-top" *ngIf="item.imageUrl" [src]="'data:image/jpeg;base64,' + item.imageUrl" [alt]="item.title" style="height: 200px; object-fit: cover;">
           
           <!-- Card Body -->
           <div class="card-body" *ngIf="item.description || item.rating">

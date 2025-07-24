@@ -44,7 +44,7 @@ public class TripItemController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<TripItemResponseDto>> UpdateTripItem(int id, UpdateTripItemDto updateTripItemDto)
+    public async Task<ActionResult<TripItemResponseDto>> UpdateTripItem(int id, [FromForm] UpdateTripItemDto updateTripItemDto)
     {
         try
         {
