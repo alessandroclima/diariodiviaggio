@@ -26,7 +26,7 @@ export class TripItemFormComponent implements OnInit {
     { value: 'Restaurant', label: 'Restaurant' },
     { value: 'Hotel', label: 'Hotel' },
     { value: 'Attraction', label: 'Attraction' },
-    { value: 'Note', label: 'Note' }
+    { value: 'Note', label: 'Notes' }
   ];
 
   constructor(
