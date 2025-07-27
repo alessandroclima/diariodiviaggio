@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://localhost:44324' // Change this to your production API URL
+  apiUrl: 'https://lericettedialeinborghese-gdfvh7ccgxc9a0e8.italynorth-01.azurewebsites.net/api' // Change this to your production API URL
 };

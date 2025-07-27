@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DiarioDiViaggioApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2e5791772c5016c73b95d0d96dc89846528165af")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+15d66adc1a524da1bdd8b78180c800a35808a338")]
 [assembly: System.Reflection.AssemblyProductAttribute("DiarioDiViaggioApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DiarioDiViaggioApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,0 +1,33 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\aless\\source\\repos\\diariodiviaggio\\diariodiviaggio\\diariodiviaggioBE\\DiarioDiViaggioApi\\wwwroot\\uploads\\.gitkeep",
+      "PackagePath": "staticwebassets\\uploads\\.gitkeep"
+    },
+    {
+      "Id": "C:\\Users\\aless\\source\\repos\\diariodiviaggio\\diariodiviaggio\\diariodiviaggioBE\\DiarioDiViaggioApi\\wwwroot\\uploads\\1\\15a98a75-5b30-4fdf-a091-0ee4c0cea7c7.jpg",
+      "PackagePath": "staticwebassets\\uploads\\1\\15a98a75-5b30-4fdf-a091-0ee4c0cea7c7.jpg"
+    },
+    {
+      "Id": "obj\\Release\\net9.0\\staticwebassets\\msbuild.DiarioDiViaggioApi.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Release\\net9.0\\staticwebassets\\msbuild.DiarioDiViaggioApi.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Release\\net9.0\\staticwebassets\\msbuild.build.DiarioDiViaggioApi.props",
+      "PackagePath": "build\\DiarioDiViaggioApi.props"
+    },
+    {
+      "Id": "obj\\Release\\net9.0\\staticwebassets\\msbuild.buildMultiTargeting.DiarioDiViaggioApi.props",
+      "PackagePath": "buildMultiTargeting\\DiarioDiViaggioApi.props"
+    },
+    {
+      "Id": "obj\\Release\\net9.0\\staticwebassets\\msbuild.buildTransitive.DiarioDiViaggioApi.props",
+      "PackagePath": "buildTransitive\\DiarioDiViaggioApi.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

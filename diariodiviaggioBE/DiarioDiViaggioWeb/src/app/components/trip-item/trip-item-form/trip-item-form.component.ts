@@ -23,10 +23,10 @@ export class TripItemFormComponent implements OnInit {
   isSubmitting = false;
   
   tripItemTypes = [
-    { value: 'restaurant', label: 'Restaurant' },
-    { value: 'hotel', label: 'Hotel' },
-    { value: 'attraction', label: 'Attraction' },
-    { value: 'note', label: 'Note' }
+    { value: 'Restaurant', label: 'Restaurant' },
+    { value: 'Hotel', label: 'Hotel' },
+    { value: 'Attraction', label: 'Attraction' },
+    { value: 'Note', label: 'Note' }
   ];
 
   constructor(
