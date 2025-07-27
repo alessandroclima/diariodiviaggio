@@ -1,2 +1,0 @@
-wwwroot\uploads\.gitkeep
-wwwroot\uploads\1\15a98a75-5b30-4fdf-a091-0ee4c0cea7c7.jpg
