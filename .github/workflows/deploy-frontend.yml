@@ -1,10 +1,10 @@
-name: Deploy Angular App to GitHub Pages
+﻿name: Deploy Angular App to GitHub Pages
 
 on:
   push:
     branches: [ main ]
     paths:
-      - 'DiarioDiViaggioWeb/**'
+      - 'diariodiviaggioBE/DiarioDiViaggioWeb/**'
   workflow_dispatch:
 
 permissions:
@@ -28,14 +28,14 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: DiarioDiViaggioWeb/package-lock.json
+          cache-dependency-path: diariodiviaggioBE/DiarioDiViaggioWeb/package-lock.json
 
       - name: Install dependencies
-        working-directory: ./DiarioDiViaggioWeb
+        working-directory: ./diariodiviaggioBE/DiarioDiViaggioWeb
         run: npm ci
 
       - name: Build for GitHub Pages
-        working-directory: ./DiarioDiViaggioWeb
+        working-directory: ./diariodiviaggioBE/DiarioDiViaggioWeb
         run: npm run build:ghpages
 
       - name: Setup Pages
@@ -44,7 +44,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./DiarioDiViaggioWeb/dist/diario-di-viaggio-web
+          path: ./diariodiviaggioBE/DiarioDiViaggioWeb/dist/diario-di-viaggio-web
 
   deploy:
     environment:
