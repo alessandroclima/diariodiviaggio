@@ -4,7 +4,9 @@ namespace DiarioDiViaggioApi.Services;
 
 public interface IAuthService
 {
-    Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto);
-    Task<AuthResponseDto> LoginAsync(LoginDto loginDto);
+    Task<(AuthResponseDto response, string refreshToken)> RegisterAsync(RegisterDto registerDto);
+    Task<(AuthResponseDto response, string refreshToken)> LoginAsync(LoginDto loginDto);
+    Task<(string accessToken, string refreshToken)> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
+    Task RevokeRefreshTokenAsync(string refreshToken);
     Task<string> GenerateJwtToken(Models.User user);
 }

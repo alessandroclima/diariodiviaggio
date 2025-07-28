@@ -21,7 +21,7 @@ public class AuthService : IAuthService
         _configuration = configuration;
     }
 
-    public async Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto)
+    public async Task<(AuthResponseDto response, string refreshToken)> RegisterAsync(RegisterDto registerDto)
     {
         // Check if user already exists
         if (await _context.Users.AnyAsync(u => u.Email == registerDto.Email))
@@ -45,19 +45,22 @@ public class AuthService : IAuthService
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        // Generate JWT token
+        // Generate JWT token and refresh token
         var token = await GenerateJwtToken(user);
+        var refreshTokenEntity = await GenerateRefreshTokenAsync(user);
 
-        return new AuthResponseDto
+        var response = new AuthResponseDto
         {
             Token = token,
             Username = user.Username,
             Email = user.Email,
             ProfileImageBase64 = user.ProfileImage != null ? Convert.ToBase64String(user.ProfileImage) : null
         };
+
+        return (response, refreshTokenEntity.Token);
     }
 
-    public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
+    public async Task<(AuthResponseDto response, string refreshToken)> LoginAsync(LoginDto loginDto)
     {
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
@@ -68,14 +71,78 @@ public class AuthService : IAuthService
         }
 
         var token = await GenerateJwtToken(user);
+        var refreshTokenEntity = await GenerateRefreshTokenAsync(user);
 
-        return new AuthResponseDto
+        var response = new AuthResponseDto
         {
             Token = token,
             Username = user.Username,
             Email = user.Email,
             ProfileImageBase64 = user.ProfileImage != null ? Convert.ToBase64String(user.ProfileImage) : null
         };
+
+        return (response, refreshTokenEntity.Token);
+    }
+
+    public async Task<(string accessToken, string refreshToken)> RefreshTokenAsync(RefreshTokenDto refreshTokenDto)
+    {
+        var refreshToken = await _context.RefreshTokens
+            .Include(rt => rt.User)
+            .FirstOrDefaultAsync(rt => rt.Token == refreshTokenDto.RefreshToken);
+
+        if (refreshToken == null || !refreshToken.IsActive)
+        {
+            throw new InvalidOperationException("Invalid or expired refresh token");
+        }
+
+        // Revoke the old refresh token
+        refreshToken.IsRevoked = true;
+        refreshToken.RevokedAt = DateTime.UtcNow;
+
+        // Generate new tokens
+        var newAccessToken = await GenerateJwtToken(refreshToken.User);
+        var newRefreshTokenEntity = await GenerateRefreshTokenAsync(refreshToken.User);
+
+        await _context.SaveChangesAsync();
+
+        return (newAccessToken, newRefreshTokenEntity.Token);
+    }
+
+    public async Task RevokeRefreshTokenAsync(string refreshToken)
+    {
+        var token = await _context.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+
+        if (token != null && token.IsActive)
+        {
+            token.IsRevoked = true;
+            token.RevokedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task<RefreshToken> GenerateRefreshTokenAsync(User user)
+    {
+        var refreshToken = new RefreshToken
+        {
+            Token = GenerateSecureToken(),
+            ExpiryDate = DateTime.UtcNow.AddDays(7), // Refresh tokens last 7 days
+            UserId = user.Id,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _context.RefreshTokens.Add(refreshToken);
+        await _context.SaveChangesAsync();
+
+        return refreshToken;
+    }
+
+    private static string GenerateSecureToken()
+    {
+        using var rng = RandomNumberGenerator.Create();
+        var tokenBytes = new byte[64];
+        rng.GetBytes(tokenBytes);
+        return Convert.ToBase64String(tokenBytes);
     }
 
     public async Task<string> GenerateJwtToken(User user)
@@ -96,7 +163,7 @@ public class AuthService : IAuthService
             issuer: jwtSettings["Issuer"],
             audience: jwtSettings["Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(Convert.ToDouble(jwtSettings["ExpirationHours"])),
+            expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["ExpirationHours"])),
             signingCredentials: credentials
         );
 

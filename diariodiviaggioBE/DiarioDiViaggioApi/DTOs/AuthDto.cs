@@ -20,3 +20,14 @@ public class AuthResponseDto
     public required string Email { get; set; }
     public string? ProfileImageBase64 { get; set; }
 }
+
+public class RefreshTokenDto
+{
+    public required string RefreshToken { get; set; }
+}
+
+public class RefreshTokenResponseDto
+{
+    public required string Token { get; set; }
+    public required string RefreshToken { get; set; }
+}

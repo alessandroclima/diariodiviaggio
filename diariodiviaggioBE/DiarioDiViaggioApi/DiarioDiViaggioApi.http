@@ -4,3 +4,48 @@ GET {{DiarioDiViaggioApi_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+# Authentication Flow Tests
+
+# Test 1: Register a new user
+POST {{DiarioDiViaggioApi_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "TestPassword123!"
+}
+
+###
+
+# Test 2: Login with the registered user
+POST {{DiarioDiViaggioApi_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "TestPassword123!"
+}
+
+###
+
+# Test 3: Access protected endpoint (use token from login response)
+# Replace {token} with actual token from login response
+GET {{DiarioDiViaggioApi_HostAddress}}/api/trips
+Authorization: Bearer {token}
+Accept: application/json
+
+###
+
+# Test 4: Refresh token (HttpOnly cookie should be sent automatically)
+POST {{DiarioDiViaggioApi_HostAddress}}/api/auth/refresh
+Content-Type: application/json
+
+###
+
+# Test 5: Revoke refresh token (logout)
+POST {{DiarioDiViaggioApi_HostAddress}}/api/auth/revoke
+Content-Type: application/json
+
+###

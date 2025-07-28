@@ -16,6 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<TripItem> TripItems { get; set; }
     public DbSet<Luggage> Luggages { get; set; }
     public DbSet<LuggageItem> LuggageItems { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

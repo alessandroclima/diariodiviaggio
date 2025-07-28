@@ -22,4 +22,5 @@ public class User
 
     public List<Trip> Trips { get; set; } = new();
     public List<TripShare> SharedTrips { get; set; } = new();
+    public List<RefreshToken> RefreshTokens { get; set; } = new();
 }
