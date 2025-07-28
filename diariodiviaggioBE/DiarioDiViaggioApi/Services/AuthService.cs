@@ -52,7 +52,8 @@ public class AuthService : IAuthService
         {
             Token = token,
             Username = user.Username,
-            Email = user.Email
+            Email = user.Email,
+            ProfileImageBase64 = user.ProfileImage != null ? Convert.ToBase64String(user.ProfileImage) : null
         };
     }
 
@@ -72,7 +73,8 @@ public class AuthService : IAuthService
         {
             Token = token,
             Username = user.Username,
-            Email = user.Email
+            Email = user.Email,
+            ProfileImageBase64 = user.ProfileImage != null ? Convert.ToBase64String(user.ProfileImage) : null
         };
     }
 

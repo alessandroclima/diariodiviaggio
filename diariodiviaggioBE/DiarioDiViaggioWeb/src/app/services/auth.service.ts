@@ -18,11 +18,13 @@ export interface AuthResponse {
   token: string;
   username: string;
   email: string;
+  profileImageBase64?: string;
 }
 
 export interface User {
   username: string;
   email: string;
+  profileImageBase64?: string;
 }
 
 @Injectable({
@@ -69,7 +71,8 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, response.token);
     const user: User = {
       username: response.username,
-      email: response.email
+      email: response.email,
+      profileImageBase64: response.profileImageBase64
     };
     this.currentUserSubject.next(user);
   }
@@ -80,9 +83,14 @@ export class AuthService {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const user: User = {
         username: payload.unique_name,
-        email: payload.email
+        email: payload.email,
+        profileImageBase64: undefined // Will be loaded separately if needed
       };
       this.currentUserSubject.next(user);
     }
+  }
+
+  updateCurrentUser(user: User): void {
+    this.currentUserSubject.next(user);
   }
 }

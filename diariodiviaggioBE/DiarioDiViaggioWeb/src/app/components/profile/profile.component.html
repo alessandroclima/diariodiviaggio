@@ -1,0 +1,117 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <button class="btn btn-outline-secondary me-3" routerLink="/trips">
+      <i class="bi bi-arrow-left"></i>
+    </button>
+    <h1 class="mb-0">My Profile</h1>
+    <div></div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="text-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary mb-3" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-muted">Loading profile...</p>
+  </div>
+
+  <!-- Profile Form -->
+  <div class="row justify-content-center" *ngIf="!loading && profile">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Profile Information</h5>
+        </div>
+        <div class="card-body">
+          <!-- Profile Image Section -->
+          <div class="text-center mb-4">
+            <div class="position-relative d-inline-block">
+              <div class="profile-image-container mb-3">
+                <img 
+                  *ngIf="imagePreview" 
+                  [src]="imagePreview" 
+                  alt="Profile" 
+                  class="rounded-circle" 
+                  style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #dee2e6;">
+                <div 
+                  *ngIf="!imagePreview" 
+                  class="rounded-circle bg-light d-flex align-items-center justify-content-center" 
+                  style="width: 150px; height: 150px; border: 3px solid #dee2e6;">
+                  <i class="bi bi-person fs-1 text-muted"></i>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Image Upload Controls -->
+            <div class="mb-3">
+              <input 
+                type="file" 
+                class="form-control d-none" 
+                id="profileImage" 
+                accept="image/*"
+                (change)="onFileSelected($event)">
+              <label for="profileImage" class="btn btn-outline-primary btn-sm me-2">
+                <i class="bi bi-camera me-1"></i>
+                Change Photo
+              </label>
+              <button 
+                type="button" 
+                class="btn btn-outline-danger btn-sm" 
+                *ngIf="imagePreview"
+                (click)="removeProfileImage()">
+                <i class="bi bi-trash me-1"></i>
+                Remove
+              </button>
+            </div>
+            <small class="text-muted">JPG, PNG or GIF. Max size 5MB.</small>
+          </div>
+
+          <!-- Username Field -->
+          <div class="mb-3">
+            <label for="username" class="form-label">Username *</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="username"
+              [(ngModel)]="username" 
+              placeholder="Enter your username" 
+              required>
+          </div>
+
+          <!-- Email Field (Read-only) -->
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input 
+              type="email" 
+              class="form-control" 
+              id="email"
+              [value]="profile.email" 
+              readonly>
+            <small class="text-muted">Email cannot be changed</small>
+          </div>
+        </div>
+        
+        <!-- Card Footer with Actions -->
+        <div class="card-footer bg-transparent">
+          <div class="d-flex justify-content-end gap-2">
+            <button 
+              class="btn btn-outline-secondary" 
+              routerLink="/trips"
+              [disabled]="saving">
+              Cancel
+            </button>
+            <button 
+              class="btn btn-primary" 
+              (click)="saveProfile()"
+              [disabled]="saving || !username.trim()">
+              <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status"></span>
+              <i *ngIf="!saving" class="bi bi-check-circle me-2"></i>
+              {{ saving ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,6 +1,9 @@
 <div class="container-fluid py-4">
   <!-- Header -->
   <div class="d-flex justify-content-between align-items-center mb-4">
+     <button class="btn btn-outline-secondary me-3" [routerLink]="['/trips', tripId]">
+      <i class="bi bi-arrow-left"></i>
+    </button>
     <h2 class="mb-0">Travel Diary Entries</h2>
     <button class="btn btn-primary" (click)="openAddForm()" *ngIf="!showAddForm">
       <i class="bi bi-plus-circle me-2"></i>
@@ -16,32 +19,32 @@
         <button 
           type="button"
           class="btn btn-outline-primary"
-          [class.active]="activeFilters['restaurant']"
-          (click)="toggleFilter('restaurant')">
+          [class.active]="activeFilters['Restaurant']"
+          (click)="toggleFilter('Restaurant')">
           <i class="bi bi-shop me-1"></i>
           Restaurants
         </button>
         <button 
           type="button"
           class="btn btn-outline-primary"
-          [class.active]="activeFilters['hotel']"
-          (click)="toggleFilter('hotel')">
+          [class.active]="activeFilters['Hotel']"
+          (click)="toggleFilter('Hotel')">
           <i class="bi bi-house me-1"></i>
           Hotels
         </button>
         <button 
           type="button"
           class="btn btn-outline-primary"
-          [class.active]="activeFilters['attraction']"
-          (click)="toggleFilter('attraction')">
+          [class.active]="activeFilters['Attraction']"
+          (click)="toggleFilter('Attraction')">
           <i class="bi bi-geo-alt me-1"></i>
           Attractions
         </button>
         <button 
           type="button"
           class="btn btn-outline-primary"
-          [class.active]="activeFilters['note']"
-          (click)="toggleFilter('note')">
+          [class.active]="activeFilters['Note']"
+          (click)="toggleFilter('Note')">
           <i class="bi bi-sticky me-1"></i>
           Notes
         </button>

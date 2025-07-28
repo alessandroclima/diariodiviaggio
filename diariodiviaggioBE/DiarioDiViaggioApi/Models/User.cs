@@ -18,6 +18,8 @@ public class User
     [Required]
     public string PasswordHash { get; set; } = string.Empty;
 
+    public byte[]? ProfileImage { get; set; }
+
     public List<Trip> Trips { get; set; } = new();
     public List<TripShare> SharedTrips { get; set; } = new();
 }
