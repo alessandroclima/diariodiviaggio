@@ -6,6 +6,7 @@ public class CreateTripDto
     public string? Description { get; set; }
     public required DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
+    public string? TripImageBase64 { get; set; }
 }
 
 public class UpdateTripDto
@@ -14,6 +15,7 @@ public class UpdateTripDto
     public string? Description { get; set; }
     public required DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
+    public string? TripImageBase64 { get; set; }
 }
 
 public class TripResponseDto
@@ -26,4 +28,5 @@ public class TripResponseDto
     public required string ShareCode { get; set; }
     public required string OwnerUsername { get; set; }
     public List<string> SharedWithUsernames { get; set; } = new();
+    public string? TripImageBase64 { get; set; }
 }

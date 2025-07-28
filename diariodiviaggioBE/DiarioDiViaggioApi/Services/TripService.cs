@@ -20,10 +20,13 @@ public class TripService : ITripService
         {
             Title = createTripDto.Title,
             Description = createTripDto.Description ?? "",
-            StartDate = createTripDto.StartDate,
-            EndDate = createTripDto.EndDate,
+            StartDate = DateTime.SpecifyKind(createTripDto.StartDate, DateTimeKind.Utc),
+            EndDate = createTripDto.EndDate.HasValue ? DateTime.SpecifyKind(createTripDto.EndDate.Value, DateTimeKind.Utc) : null,
             OwnerId = userId,
-            ShareCode = GenerateShareCode()
+            ShareCode = GenerateShareCode(),
+            TripImage = !string.IsNullOrEmpty(createTripDto.TripImageBase64) 
+                ? Convert.FromBase64String(createTripDto.TripImageBase64) 
+                : null
         };
 
         _context.Trips.Add(trip);
@@ -44,8 +47,16 @@ public class TripService : ITripService
 
         trip.Title = updateTripDto.Title;
         trip.Description = updateTripDto.Description ?? "";
-        trip.StartDate = updateTripDto.StartDate;
-        trip.EndDate = updateTripDto.EndDate;
+        trip.StartDate = DateTime.SpecifyKind(updateTripDto.StartDate, DateTimeKind.Utc);
+        trip.EndDate = updateTripDto.EndDate.HasValue ? DateTime.SpecifyKind(updateTripDto.EndDate.Value, DateTimeKind.Utc) : null;
+        
+        // Update trip image if provided
+        if (updateTripDto.TripImageBase64 != null)
+        {
+            trip.TripImage = !string.IsNullOrEmpty(updateTripDto.TripImageBase64) 
+                ? Convert.FromBase64String(updateTripDto.TripImageBase64) 
+                : null;
+        }
 
         await _context.SaveChangesAsync();
 
@@ -176,7 +187,8 @@ public class TripService : ITripService
             EndDate = trip.EndDate,
             ShareCode = trip.ShareCode,
             OwnerUsername = trip.Owner.Username,
-            SharedWithUsernames = trip.SharedWithUsers.Select(ts => ts.User.Username).ToList()
+            SharedWithUsernames = trip.SharedWithUsers.Select(ts => ts.User.Username).ToList(),
+            TripImageBase64 = trip.TripImage != null ? Convert.ToBase64String(trip.TripImage) : null
         };
     }
 }

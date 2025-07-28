@@ -12,6 +12,7 @@ export interface Trip {
   shareCode: string;
   ownerUsername: string;
   sharedWithUsernames: string[];
+  tripImageBase64?: string;
 }
 
 export interface CreateTripRequest {
@@ -19,6 +20,7 @@ export interface CreateTripRequest {
   description?: string;
   startDate: string;
   endDate?: string;
+  tripImageBase64?: string;
 }
 
 export interface UpdateTripRequest {
@@ -26,6 +28,7 @@ export interface UpdateTripRequest {
   description?: string;
   startDate: string;
   endDate?: string;
+  tripImageBase64?: string;
 }
 
 @Injectable({

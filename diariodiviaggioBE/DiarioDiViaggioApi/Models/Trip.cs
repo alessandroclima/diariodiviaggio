@@ -15,9 +15,10 @@ public class Trip
     public string Description { get; set; } = string.Empty;
 
     [Required]
-    public DateTime StartDate { get; set; }
+    public DateTime StartDate { get; set; } =  DateTime.UtcNow;
 
-    public DateTime? EndDate { get; set; }
+
+    public DateTime? EndDate { get; set; }  = DateTime.UtcNow;
 
     [Required]
     public int OwnerId { get; set; }
@@ -26,6 +27,8 @@ public class Trip
     public User Owner { get; set; } = null!;
 
     public string ShareCode { get; set; } = string.Empty;
+
+    public byte[]? TripImage { get; set; }
 
     public List<TripShare> SharedWithUsers { get; set; } = new();
     public List<TripItem> Items { get; set; } = new();
