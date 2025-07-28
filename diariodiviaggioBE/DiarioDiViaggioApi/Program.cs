@@ -37,6 +37,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Add CORS services
+builder.Services.AddCors();
+
 // Register services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITripService, TripService>();
@@ -59,9 +62,14 @@ app.UseStaticFiles();
 
 app.UseCors(options =>
 {
-    options.AllowAnyHeader();
-    options.AllowAnyOrigin();
-    options.AllowAnyMethod();
+    options.WithOrigins(
+        "https://alessandroclima.github.io",
+        "http://localhost:4200",
+        "https://localhost:4200"
+    )
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials();
 });
 
 app.UseAuthentication();
