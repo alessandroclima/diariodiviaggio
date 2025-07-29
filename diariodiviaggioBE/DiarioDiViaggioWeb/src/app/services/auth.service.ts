@@ -28,6 +28,15 @@ export interface User {
   profileImageBase64?: string;
 }
 
+export interface PasswordResetRequest {
+  email: string;
+}
+
+export interface PasswordReset {
+  token: string;
+  newPassword: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -156,5 +165,13 @@ export class AuthService {
 
   updateCurrentUser(user: User): void {
     this.currentUserSubject.next(user);
+  }
+
+  requestPasswordReset(request: PasswordResetRequest): Observable<{message: string}> {
+    return this.http.post<{message: string}>(`${this.apiUrl}/forgot-password`, request, { withCredentials: true });
+  }
+
+  resetPassword(resetData: PasswordReset): Observable<{message: string}> {
+    return this.http.post<{message: string}>(`${this.apiUrl}/reset-password`, resetData, { withCredentials: true });
   }
 }

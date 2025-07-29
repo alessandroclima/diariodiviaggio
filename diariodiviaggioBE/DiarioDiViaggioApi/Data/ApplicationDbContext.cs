@@ -17,6 +17,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Luggage> Luggages { get; set; }
     public DbSet<LuggageItem> LuggageItems { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -53,5 +54,16 @@ public class ApplicationDbContext : DbContext
             .WithMany(u => u.SharedTrips)
             .HasForeignKey(ts => ts.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure PasswordResetToken relationship
+        modelBuilder.Entity<PasswordResetToken>()
+            .HasOne(prt => prt.User)
+            .WithMany(u => u.PasswordResetTokens)
+            .HasForeignKey(prt => prt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<PasswordResetToken>()
+            .HasIndex(prt => prt.Token)
+            .IsUnique();
     }
 }

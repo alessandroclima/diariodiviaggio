@@ -134,4 +134,61 @@ public class AuthController : ControllerBase
 
         Response.Cookies.Append("refreshToken", "", cookieOptions);
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult> ForgotPassword(PasswordResetRequestDto request)
+    {
+        try
+        {
+            var ipAddress = GetClientIpAddress();
+            await _authService.RequestPasswordResetAsync(request, ipAddress);
+            
+            // Always return success to prevent email enumeration attacks
+            return Ok(new { message = "If the email address is registered, you will receive a password reset link shortly." });
+        }
+        catch (Exception ex)
+        {
+            // Log the exception but don't expose details to client
+            return StatusCode(500, new { message = "An error occurred while processing your request." });
+        }
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<ActionResult> ResetPassword(PasswordResetDto resetDto)
+    {
+        try
+        {
+            var ipAddress = GetClientIpAddress();
+            await _authService.ResetPasswordAsync(resetDto, ipAddress);
+            
+            return Ok(new { message = "Password has been reset successfully. You can now log in with your new password." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            // Log the exception but don't expose details to client
+            return StatusCode(500, new { message = "An error occurred while resetting your password." });
+        }
+    }
+
+    private string GetClientIpAddress()
+    {
+        // Try to get the real IP address from various headers
+        var ipAddress = Request.Headers["X-Forwarded-For"].FirstOrDefault()?.Split(',').FirstOrDefault()?.Trim();
+        
+        if (string.IsNullOrEmpty(ipAddress))
+        {
+            ipAddress = Request.Headers["X-Real-IP"].FirstOrDefault();
+        }
+        
+        if (string.IsNullOrEmpty(ipAddress))
+        {
+            ipAddress = Request.HttpContext.Connection.RemoteIpAddress?.ToString();
+        }
+        
+        return ipAddress ?? "Unknown";
+    }
 }

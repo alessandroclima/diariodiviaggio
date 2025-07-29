@@ -28,6 +28,8 @@ import { HomeComponent } from './components/home/home.component';
 import { FilterByPipe } from './pipes/filter-by.pipe';
 import { RouterModule } from '@angular/router';
 import { ProfileComponent } from './components/profile/profile.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +44,9 @@ import { ProfileComponent } from './components/profile/profile.component';
     LuggageDetailComponent,
     HomeComponent,
     FilterByPipe,
-    ProfileComponent
+    ProfileComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent
   ],
   imports: [
     BrowserModule,

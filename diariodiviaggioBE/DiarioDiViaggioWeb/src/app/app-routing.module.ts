@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './components/auth/login/login.component';
 import { RegisterComponent } from './components/auth/register/register.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { HomeComponent } from './components/home/home.component';
 import { TripListComponent } from './components/trip/trip-list/trip-list.component';
 import { TripDetailComponent } from './components/trip/trip-detail/trip-detail.component';
@@ -18,6 +20,8 @@ const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'trips', component: TripListComponent, canActivate: [AuthGuard] },
   { path: 'trips/new', component: TripDetailComponent, canActivate: [AuthGuard] },

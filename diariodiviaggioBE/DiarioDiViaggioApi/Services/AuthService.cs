@@ -14,11 +14,13 @@ public class AuthService : IAuthService
 {
     private readonly ApplicationDbContext _context;
     private readonly IConfiguration _configuration;
+    private readonly IEmailService _emailService;
 
-    public AuthService(ApplicationDbContext context, IConfiguration configuration)
+    public AuthService(ApplicationDbContext context, IConfiguration configuration, IEmailService emailService)
     {
         _context = context;
         _configuration = configuration;
+        _emailService = emailService;
     }
 
     public async Task<(AuthResponseDto response, string refreshToken)> RegisterAsync(RegisterDto registerDto)
@@ -180,5 +182,92 @@ public class AuthService : IAuthService
     private static bool VerifyPassword(string password, string hash)
     {
         return HashPassword(password) == hash;
+    }
+
+    public async Task RequestPasswordResetAsync(PasswordResetRequestDto request, string ipAddress)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (user == null)
+        {
+            // Don't reveal if email exists or not for security
+            return;
+        }
+
+        // Invalidate any existing unused password reset tokens for this user
+        var existingTokens = await _context.PasswordResetTokens
+            .Where(prt => prt.UserId == user.Id && !prt.IsUsed && prt.ExpiryDate > DateTime.UtcNow)
+            .ToListAsync();
+
+        foreach (var token in existingTokens)
+        {
+            token.IsUsed = true;
+            token.UsedAt = DateTime.UtcNow;
+        }
+
+        // Generate new reset token
+        var resetToken = GenerateSecureToken();
+        var passwordResetToken = new PasswordResetToken
+        {
+            Token = resetToken,
+            UserId = user.Id,
+            CreatedAt = DateTime.UtcNow,
+            ExpiryDate = DateTime.UtcNow.AddHours(1), // 1 hour expiry
+            IpAddress = ipAddress
+        };
+
+        _context.PasswordResetTokens.Add(passwordResetToken);
+        await _context.SaveChangesAsync();
+
+        // Send reset email
+        await _emailService.SendPasswordResetEmailAsync(user.Email, user.Username, resetToken);
+    }
+
+    public async Task ResetPasswordAsync(PasswordResetDto resetDto, string ipAddress)
+    {
+        var passwordResetToken = await _context.PasswordResetTokens
+            .Include(prt => prt.User)
+            .FirstOrDefaultAsync(prt => prt.Token == resetDto.Token);
+
+        if (passwordResetToken == null)
+        {
+            throw new InvalidOperationException("Invalid reset token");
+        }
+
+        if (passwordResetToken.IsUsed)
+        {
+            throw new InvalidOperationException("Reset token has already been used");
+        }
+
+        if (passwordResetToken.ExpiryDate < DateTime.UtcNow)
+        {
+            throw new InvalidOperationException("Reset token has expired");
+        }
+
+        // Validate new password (basic validation)
+        if (string.IsNullOrEmpty(resetDto.NewPassword) || resetDto.NewPassword.Length < 6)
+        {
+            throw new InvalidOperationException("Password must be at least 6 characters long");
+        }
+
+        // Update user password
+        var user = passwordResetToken.User;
+        user.PasswordHash = HashPassword(resetDto.NewPassword);
+
+        // Mark token as used
+        passwordResetToken.IsUsed = true;
+        passwordResetToken.UsedAt = DateTime.UtcNow;
+
+        // Revoke all existing refresh tokens for security
+        var userRefreshTokens = await _context.RefreshTokens
+            .Where(rt => rt.UserId == user.Id && rt.IsRevoked == false && DateTime.UtcNow < rt.ExpiryDate)
+            .ToListAsync();
+
+        foreach (var refreshToken in userRefreshTokens)
+        {
+            refreshToken.IsRevoked = true;
+            refreshToken.RevokedAt = DateTime.UtcNow;
+        }
+
+        await _context.SaveChangesAsync();
     }
 }

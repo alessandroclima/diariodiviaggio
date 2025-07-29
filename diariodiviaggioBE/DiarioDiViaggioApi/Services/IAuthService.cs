@@ -9,4 +9,6 @@ public interface IAuthService
     Task<(string accessToken, string refreshToken)> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
     Task RevokeRefreshTokenAsync(string refreshToken);
     Task<string> GenerateJwtToken(Models.User user);
+    Task RequestPasswordResetAsync(PasswordResetRequestDto request, string ipAddress);
+    Task ResetPasswordAsync(PasswordResetDto resetDto, string ipAddress);
 }
