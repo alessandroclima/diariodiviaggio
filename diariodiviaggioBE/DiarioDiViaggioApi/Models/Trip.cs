@@ -33,4 +33,5 @@ public class Trip
     public List<TripShare> SharedWithUsers { get; set; } = new();
     public List<TripItem> Items { get; set; } = new();
     public List<Luggage> Luggages { get; set; } = new();
+    public List<Itinerary> Itineraries { get; set; } = new();
 }

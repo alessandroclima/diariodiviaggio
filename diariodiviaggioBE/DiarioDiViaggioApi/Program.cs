@@ -52,6 +52,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ITripService, TripService>();
 builder.Services.AddScoped<ITripItemService, TripItemService>();
 builder.Services.AddScoped<ILuggageService, LuggageService>();
+builder.Services.AddScoped<IItineraryService, ItineraryService>();
 
 
 var app = builder.Build();

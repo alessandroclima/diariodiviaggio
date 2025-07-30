@@ -11,6 +11,8 @@ import { TripItemListComponent } from './components/trip-item/trip-item-list/tri
 import { TripItemFormComponent } from './components/trip-item/trip-item-form/trip-item-form.component';
 import { LuggageListComponent } from './components/luggage/luggage-list/luggage-list.component';
 import { LuggageDetailComponent } from './components/luggage/luggage-detail/luggage-detail.component';
+import { ItineraryCalendarComponent } from './components/itinerary/itinerary-calendar/itinerary-calendar.component';
+import { ItineraryFormComponent } from './components/itinerary/itinerary-form/itinerary-form.component';
 import { ProfileComponent } from './components/profile/profile.component';
 
 import { AuthGuard } from './guards/auth.guard';
@@ -26,6 +28,9 @@ const routes: Routes = [
   { path: 'trips', component: TripListComponent, canActivate: [AuthGuard] },
   { path: 'trips/new', component: TripDetailComponent, canActivate: [AuthGuard] },
   { path: 'trips/:id', component: TripDetailComponent, canActivate: [AuthGuard] },
+  { path: 'trips/:id/itinerary', component: ItineraryCalendarComponent, canActivate: [AuthGuard] },
+  { path: 'trips/:tripId/itinerary/new', component: ItineraryFormComponent, canActivate: [AuthGuard] },
+  { path: 'trips/:tripId/itinerary/:activityId/edit', component: ItineraryFormComponent, canActivate: [AuthGuard] },
   { path: 'trips/:tripId/items', component: TripItemListComponent, canActivate: [AuthGuard] },
   { path: 'trips/:tripId/items/new', component: TripItemFormComponent, canActivate: [AuthGuard] },
   { path: 'trips/:tripId/items/:id', component: TripItemFormComponent, canActivate: [AuthGuard] },

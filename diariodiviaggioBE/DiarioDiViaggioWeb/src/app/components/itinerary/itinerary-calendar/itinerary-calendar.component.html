@@ -1,0 +1,177 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-3" (click)="goBack()">
+        <i class="bi bi-arrow-left"></i>
+      </button>
+      <h1 class="mb-0">
+        <i class="bi bi-calendar-week me-2"></i>
+        Itinerario - {{ calendar?.tripTitle }}
+      </h1>
+    </div>
+    <div class="d-flex align-items-center">
+      <button class="btn btn-outline-secondary me-2" (click)="previousWeek()">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <h4 class="mb-0 mx-3">{{ currentWeekRange }}</h4>
+      <button class="btn btn-outline-secondary" (click)="nextWeek()">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="d-flex justify-content-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Caricamento...</span>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ error }}
+  </div>
+
+  <!-- Weekly Calendar -->
+  <div *ngIf="!isLoading && calendar" class="weekly-calendar-container">
+    <!-- Trip Info -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body py-3">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h5 class="mb-1">{{ calendar.tripTitle }}</h5>
+            <small class="text-muted">
+              <i class="bi bi-calendar me-1"></i>
+              Dal {{ formatDate(calendar.startDate) }}
+              <span *ngIf="calendar.endDate"> al {{ formatDate(calendar.endDate) }}</span>
+            </small>
+          </div>
+          <div class="col-md-4 text-md-end">
+            <span class="badge bg-light text-dark me-2">
+              <i class="bi bi-sun me-1"></i> Mattina
+            </span>
+            <span class="badge bg-light text-dark">
+              <i class="bi bi-sunset me-1"></i> Pomeriggio
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly Calendar -->
+    <div class="weekly-grid">
+      <!-- Week Days -->
+      <div class="week-row">
+        <div 
+          *ngFor="let day of weekDays" 
+          class="week-day-column"
+          [class.trip-day]="day.isTripDay"
+          [class.today]="day.isToday">
+          
+          <!-- Day Header -->
+          <div class="day-header">
+            <div class="day-name">{{ day.dayName }}</div>
+            <div class="day-number" [class.today-number]="day.isToday">{{ day.dayNumber }}</div>
+          </div>
+
+          <!-- Day Content -->
+          <div class="day-content" *ngIf="day.isTripDay">
+            <!-- Morning Activities -->
+            <div class="time-slot-section morning-section">
+              <div class="time-slot-header">
+                <i class="bi bi-sunrise text-warning me-1"></i>
+                <span class="time-slot-title">Mattina</span>
+                <button 
+                  class="btn btn-sm btn-outline-primary ms-auto add-btn"
+                  (click)="addActivity(day.date, 0)"
+                  title="Aggiungi attività mattutina">
+                  <i class="bi bi-plus"></i>
+                </button>
+              </div>
+              <div class="activities-list">
+                <div 
+                  *ngFor="let activity of getMorningActivities(day.date)"
+                  class="activity-card"
+                  [class.completed]="activity.isCompleted"
+                  (click)="editActivity(activity.id)">
+                  <div class="activity-header">
+                    <i [class]="getActivityIcon(activity.activityType)" class="activity-type-icon"></i>
+                    <h6 class="activity-title mb-0">{{ activity.title }}</h6>
+                    <button
+                      class="btn btn-sm btn-link p-0 ms-auto completion-btn"
+                      (click)="toggleActivityCompletion(activity); $event.stopPropagation()"
+                      title="{{ activity.isCompleted ? 'Segna come da fare' : 'Segna come completato' }}">
+                      <i [class]="activity.isCompleted ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted'"></i>
+                    </button>
+                  </div>
+                  <div *ngIf="activity.location" class="activity-location">
+                    <i class="bi bi-geo-alt text-muted me-1"></i>
+                    <small class="text-muted">{{ activity.location }}</small>
+                  </div>
+                  <div *ngIf="activity.description" class="activity-description">
+                    <small>{{ activity.description }}</small>
+                  </div>
+                </div>
+                <div *ngIf="getMorningActivities(day.date).length === 0" class="no-activities">
+                  <small class="text-muted">Nessuna attività</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Afternoon Activities -->
+            <div class="time-slot-section afternoon-section">
+              <div class="time-slot-header">
+                <i class="bi bi-sunset text-primary me-1"></i>
+                <span class="time-slot-title">Pomeriggio</span>
+                <button 
+                  class="btn btn-sm btn-outline-primary ms-auto add-btn"
+                  (click)="addActivity(day.date, 1)"
+                  title="Aggiungi attività pomeridiana">
+                  <i class="bi bi-plus"></i>
+                </button>
+              </div>
+              <div class="activities-list">
+                <div 
+                  *ngFor="let activity of getAfternoonActivities(day.date)"
+                  class="activity-card"
+                  [class.completed]="activity.isCompleted"
+                  (click)="editActivity(activity.id)">
+                  <div class="activity-header">
+                    <i [class]="getActivityIcon(activity.activityType)" class="activity-type-icon"></i>
+                    <h6 class="activity-title mb-0">{{ activity.title }}</h6>
+                    <button
+                      class="btn btn-sm btn-link p-0 ms-auto completion-btn"
+                      (click)="toggleActivityCompletion(activity); $event.stopPropagation()"
+                      title="{{ activity.isCompleted ? 'Segna come da fare' : 'Segna come completato' }}">
+                      <i [class]="activity.isCompleted ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted'"></i>
+                    </button>
+                  </div>
+                  <div *ngIf="activity.location" class="activity-location">
+                    <i class="bi bi-geo-alt text-muted me-1"></i>
+                    <small class="text-muted">{{ activity.location }}</small>
+                  </div>
+                  <div *ngIf="activity.description" class="activity-description">
+                    <small>{{ activity.description }}</small>
+                  </div>
+                </div>
+                <div *ngIf="getAfternoonActivities(day.date).length === 0" class="no-activities">
+                  <small class="text-muted">Nessuna attività</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Non-trip day -->
+          <div *ngIf="!day.isTripDay" class="non-trip-day">
+            <div class="text-center py-4">
+              <i class="bi bi-calendar-x text-muted"></i>
+              <div><small class="text-muted">Non in viaggio</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

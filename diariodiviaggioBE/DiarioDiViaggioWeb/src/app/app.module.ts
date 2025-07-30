@@ -30,6 +30,8 @@ import { RouterModule } from '@angular/router';
 import { ProfileComponent } from './components/profile/profile.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { ItineraryCalendarComponent } from './components/itinerary/itinerary-calendar/itinerary-calendar.component';
+import { ItineraryFormComponent } from './components/itinerary/itinerary-form/itinerary-form.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +48,9 @@ import { ResetPasswordComponent } from './components/reset-password/reset-passwo
     FilterByPipe,
     ProfileComponent,
     ForgotPasswordComponent,
-    ResetPasswordComponent
+    ResetPasswordComponent,
+    ItineraryCalendarComponent,
+    ItineraryFormComponent
   ],
   imports: [
     BrowserModule,
