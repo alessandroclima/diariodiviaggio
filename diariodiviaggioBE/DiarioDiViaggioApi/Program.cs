@@ -7,6 +7,12 @@ using DiarioDiViaggioApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables();
+
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -63,8 +69,10 @@ app.UseStaticFiles();
 
 app.UseCors(options =>
 {
+    var frontendUrl = app.Configuration["AppSettings:FrontendUrl"] ?? "http://localhost:4200";
     options.WithOrigins(
         "https://alessandroclima.github.io",
+        frontendUrl,
         "http://localhost:4200",
         "https://localhost:4200"
     )

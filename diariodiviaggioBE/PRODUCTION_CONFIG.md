@@ -25,16 +25,18 @@ The production configuration uses environment variables for sensitive data. Set 
 - `SMTP_PORT`: SMTP server port
   - Gmail/TLS: `587`
   - Gmail/SSL: `465`
-- `EMAIL_SENDER_NAME`: Display name for outgoing emails
-  - Example: `Diario Di Viaggio`
-- `EMAIL_SENDER_ADDRESS`: Email address used as sender
+- `EMAIL_SENDER_NAME`: Display name for SMTP authentication
+  - Example: `babygatemina@gmail.com`
+- `EMAIL_SENDER_PASSWORD`: SMTP authentication password (use app passwords for Gmail)
+- `EMAIL_FROM`: Email address used as sender
   - Example: `noreply@yourdomain.com`
-- `EMAIL_USERNAME`: SMTP authentication username
-- `EMAIL_PASSWORD`: SMTP authentication password (use app passwords for Gmail)
+- `NAME_FROM`: Display name for outgoing emails
+  - Example: `Diario Di Viaggio`
 
 ### Frontend Configuration
 - `FRONTEND_URL`: Production frontend URL
-  - Example: `https://yourdomain.com`
+  - Example: `https://alessandroclima.github.io` (for GitHub Pages)
+  - **Important**: This must match your deployed frontend URL exactly to avoid CORS errors
 
 ## Azure App Service Configuration
 
@@ -56,10 +58,10 @@ JWT_ISSUER=https://localhost:5001
 JWT_AUDIENCE=https://localhost:5001/api
 SMTP_SERVER=smtp.gmail.com
 SMTP_PORT=587
-EMAIL_SENDER_NAME=Diario Di Viaggio
-EMAIL_SENDER_ADDRESS=your-email@gmail.com
-EMAIL_USERNAME=your-email@gmail.com
-EMAIL_PASSWORD=your-app-password
+EMAIL_SENDER_NAME=your-email@gmail.com
+EMAIL_SENDER_PASSWORD=your-app-password
+EMAIL_FROM=your-email@gmail.com
+NAME_FROM=Diario Di Viaggio
 FRONTEND_URL=https://localhost:4200
 ```
 
@@ -87,3 +89,33 @@ dotnet run
 - [ ] Frontend URL matches deployed frontend
 - [ ] SSL/HTTPS enabled
 - [ ] Logs configured for production monitoring
+
+## Troubleshooting CORS Issues
+
+If you encounter CORS errors like "No 'Access-Control-Allow-Origin' header is present":
+
+1. **Verify Environment Variables in Azure App Service**:
+   - Go to Azure Portal → Your App Service → Configuration → Application Settings
+   - Ensure `FRONTEND_URL` is set to your exact frontend URL (e.g., `https://alessandroclima.github.io`)
+   - Restart your app service after adding/changing environment variables
+
+2. **Check CORS Configuration**:
+   - The backend automatically includes your `FRONTEND_URL` in CORS origins
+   - Common frontend URLs that should work:
+     - `https://alessandroclima.github.io` (GitHub Pages)
+     - `https://yourdomain.com` (Custom domain)
+     - `http://localhost:4200` (Local development)
+
+3. **Azure App Service Specific Steps**:
+   ```bash
+   # Set the environment variable via Azure CLI
+   az webapp config appsettings set --resource-group your-resource-group --name your-app-name --settings FRONTEND_URL="https://alessandroclima.github.io"
+   
+   # Restart the app service
+   az webapp restart --resource-group your-resource-group --name your-app-name
+   ```
+
+4. **Verify the Configuration**:
+   - Check your app logs to ensure the environment variables are being read correctly
+   - Test the API endpoints directly to ensure they're responding
+   - Use browser developer tools to inspect CORS headers in the response
