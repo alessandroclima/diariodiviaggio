@@ -171,15 +171,27 @@
 
           <!-- Card Actions -->
           <div class="card-footer bg-transparent border-top-0">
-            <div class="d-flex justify-content-end gap-2">
-              <button type="button" class="btn btn-outline-secondary" (click)="goBack()">
-                Annulla
-              </button>
-              <button type="submit" class="btn btn-primary" [disabled]="activityForm.invalid || isSaving">
-                <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status"></span>
-                <i class="bi bi-check-lg me-1" *ngIf="!isSaving"></i>
-                {{ isEditMode ? 'Aggiorna' : 'Crea' }} Attività
-              </button>
+            <div class="d-flex justify-content-between align-items-center">
+              <!-- Delete Button (only in edit mode) -->
+              <div *ngIf="isEditMode">
+                <button type="button" class="btn btn-outline-danger" (click)="confirmDelete()">
+                  <i class="bi bi-trash me-1"></i>
+                  Elimina
+                </button>
+              </div>
+              <div *ngIf="!isEditMode"></div>
+              
+              <!-- Action Buttons -->
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary" (click)="goBack()">
+                  Annulla
+                </button>
+                <button type="submit" class="btn btn-primary" [disabled]="activityForm.invalid || isSaving">
+                  <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  <i class="bi bi-check-lg me-1" *ngIf="!isSaving"></i>
+                  {{ isEditMode ? 'Aggiorna' : 'Crea' }} Attività
+                </button>
+              </div>
             </div>
           </div>
         </div>

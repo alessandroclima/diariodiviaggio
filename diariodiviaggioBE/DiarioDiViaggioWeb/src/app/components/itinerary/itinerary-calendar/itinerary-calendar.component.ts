@@ -90,6 +90,7 @@ export class ItineraryCalendarComponent implements OnInit {
 
   toggleActivityCompletion(activity: ItineraryDto): void {
     const updateDto = {
+      date: activity.date,
       title: activity.title,
       description: activity.description,
       activityType: activity.activityType,
@@ -128,6 +129,35 @@ export class ItineraryCalendarComponent implements OnInit {
 
   getActivityTypeName(activityType: ItineraryActivityType): string {
     return this.itineraryService.getActivityTypeInfo(activityType).label;
+  }
+
+  getActivityBackgroundColor(activityType: ItineraryActivityType): string {
+    switch (activityType) {
+      case ItineraryActivityType.Sightseeing:
+        return 'rgba(255, 193, 7, 0.15)'; // Light amber - for tourism/sightseeing
+      case ItineraryActivityType.Restaurant:
+        return 'rgba(220, 53, 69, 0.15)'; // Light red - for food/restaurant
+      case ItineraryActivityType.Transportation:
+        return 'rgba(108, 117, 125, 0.15)'; // Light gray - for transportation
+      case ItineraryActivityType.Accommodation:
+        return 'rgba(13, 202, 240, 0.15)'; // Light cyan - for accommodation
+      case ItineraryActivityType.Shopping:
+        return 'rgba(214, 51, 132, 0.15)'; // Light pink - for shopping
+      case ItineraryActivityType.Entertainment:
+        return 'rgba(111, 66, 193, 0.15)'; // Light purple - for entertainment
+      case ItineraryActivityType.Outdoor:
+        return 'rgba(25, 135, 84, 0.15)'; // Light green - for outdoor activities
+      case ItineraryActivityType.Cultural:
+        return 'rgba(13, 110, 253, 0.15)'; // Light blue - for cultural activities
+      case ItineraryActivityType.Relaxation:
+        return 'rgba(214, 51, 132, 0.12)'; // Very light pink - for relaxation
+      case ItineraryActivityType.Business:
+        return 'rgba(108, 117, 125, 0.12)'; // Very light gray - for business
+      case ItineraryActivityType.Other:
+        return 'rgba(173, 181, 189, 0.15)'; // Light neutral gray - for other
+      default:
+        return 'rgba(248, 249, 250, 0.5)'; // Very light gray - fallback
+    }
   }
 
   getTimeSlotIcon(timeSlot: ItineraryTimeSlot): string {

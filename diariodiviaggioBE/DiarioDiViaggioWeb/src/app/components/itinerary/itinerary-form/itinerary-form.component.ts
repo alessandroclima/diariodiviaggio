@@ -103,6 +103,7 @@ export class ItineraryFormComponent implements OnInit {
 
     if (this.isEditMode && this.activityId) {
       const updateDto: UpdateItineraryDto = {
+        date: formValue.date,
         title: formValue.title,
         description: formValue.description || undefined,
         activityType: +formValue.activityType, // Convert to number
@@ -149,6 +150,35 @@ export class ItineraryFormComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/trips', this.tripId, 'itinerary']);
+  }
+
+  confirmDelete(): void {
+    if (!this.isEditMode || !this.activityId) return;
+
+    const confirmMessage = 'Sei sicuro di voler eliminare questa attività? Questa azione non può essere annullata.';
+    
+    if (confirm(confirmMessage)) {
+      this.deleteActivity();
+    }
+  }
+
+  private deleteActivity(): void {
+    if (!this.activityId) return;
+
+    this.isSaving = true;
+    this.error = null;
+
+    this.itineraryService.deleteItinerary(this.activityId).subscribe({
+      next: () => {
+        // Navigate back to the itinerary calendar
+        this.router.navigate(['/trips', this.tripId, 'itinerary']);
+      },
+      error: (error) => {
+        this.error = 'Errore nell\'eliminazione dell\'attività';
+        this.isSaving = false;
+        console.error('Error deleting activity:', error);
+      }
+    });
   }
 
   getActivityTypeIcon(activityType: ItineraryActivityType): string {

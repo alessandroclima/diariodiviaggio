@@ -15,6 +15,7 @@ export interface CreateItineraryDto {
 }
 
 export interface UpdateItineraryDto {
+  date: string;
   title: string;
   description?: string;
   activityType: ItineraryActivityType;

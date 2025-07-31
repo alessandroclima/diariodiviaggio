@@ -33,6 +33,9 @@ namespace DiarioDiViaggioApi.DTOs
     public class UpdateItineraryDto
     {
         [Required]
+        public DateTime Date { get; set; }
+
+        [Required]
         [StringLength(200)]
         public string Title { get; set; } = string.Empty;
 

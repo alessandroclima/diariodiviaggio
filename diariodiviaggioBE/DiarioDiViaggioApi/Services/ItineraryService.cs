@@ -123,6 +123,7 @@ namespace DiarioDiViaggioApi.Services
                 return null;
             }
 
+            itinerary.Date = DateTime.SpecifyKind(updateItineraryDto.Date, DateTimeKind.Utc);
             itinerary.Title = updateItineraryDto.Title;
             itinerary.Description = updateItineraryDto.Description;
             itinerary.ActivityType = updateItineraryDto.ActivityType;

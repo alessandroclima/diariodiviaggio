@@ -1,23 +1,15 @@
-<div class="modal fade" [class.show]="isVisible" [style.display]="isVisible ? 'block' : 'none'" 
-     tabindex="-1" (click)="onBackdropClick($event)" *ngIf="isVisible">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">{{ data.title }}</h5>
-        <button type="button" class="btn-close" (click)="onCancel()" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p>{{ data.message }}</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="onCancel()">
-          {{ data.cancelButtonText || 'Annulla' }}
-        </button>
-        <button type="button" class="btn btn-danger" (click)="onConfirm()">
-          {{ data.confirmButtonText }}
-        </button>
-      </div>
-    </div>
-  </div>
+<div class="modal-header">
+  <h5 class="modal-title">{{ title }}</h5>
+  <button type="button" class="btn-close" (click)="onCancel()" aria-label="Close"></button>
 </div>
-<div class="modal-backdrop fade" [class.show]="isVisible" *ngIf="isVisible"></div>
+<div class="modal-body">
+  <p>{{ message }}</p>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="onCancel()">
+    {{ cancelButtonText }}
+  </button>
+  <button type="button" class="btn btn-danger" (click)="onConfirm()">
+    {{ confirmButtonText }}
+  </button>
+</div>

@@ -95,6 +95,7 @@
                   *ngFor="let activity of getMorningActivities(day.date)"
                   class="activity-card"
                   [class.completed]="activity.isCompleted"
+                  [style.background-color]="getActivityBackgroundColor(activity.activityType)"
                   (click)="editActivity(activity.id)">
                   <div class="activity-header">
                     <i [class]="getActivityIcon(activity.activityType)" class="activity-type-icon"></i>
@@ -137,6 +138,7 @@
                   *ngFor="let activity of getAfternoonActivities(day.date)"
                   class="activity-card"
                   [class.completed]="activity.isCompleted"
+                  [style.background-color]="getActivityBackgroundColor(activity.activityType)"
                   (click)="editActivity(activity.id)">
                   <div class="activity-header">
                     <i [class]="getActivityIcon(activity.activityType)" class="activity-type-icon"></i>

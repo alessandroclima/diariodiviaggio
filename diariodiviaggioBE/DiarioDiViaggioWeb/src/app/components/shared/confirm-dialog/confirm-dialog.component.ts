@@ -1,11 +1,5 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-
-export interface ConfirmDialogData {
-  title: string;
-  message: string;
-  confirmButtonText: string;
-  cancelButtonText?: string;
-}
+import { Component } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -13,31 +7,18 @@ export interface ConfirmDialogData {
   styleUrls: ['./confirm-dialog.component.scss']
 })
 export class ConfirmDialogComponent {
-  @Input() data: ConfirmDialogData = {
-    title: 'Conferma',
-    message: 'Sei sicuro?',
-    confirmButtonText: 'Conferma',
-    cancelButtonText: 'Annulla'
-  };
-  @Input() isVisible: boolean = false;
-  @Output() confirmed = new EventEmitter<boolean>();
-  @Output() visibilityChange = new EventEmitter<boolean>();
+  title: string = 'Confirm';
+  message: string = 'Are you sure?';
+  confirmButtonText: string = 'Confirm';
+  cancelButtonText: string = 'Cancel';
+
+  constructor(public activeModal: NgbActiveModal) { }
 
   onCancel(): void {
-    this.isVisible = false;
-    this.visibilityChange.emit(false);
-    this.confirmed.emit(false);
+    this.activeModal.dismiss(false);
   }
 
   onConfirm(): void {
-    this.isVisible = false;
-    this.visibilityChange.emit(false);
-    this.confirmed.emit(true);
-  }
-
-  onBackdropClick(event: Event): void {
-    if (event.target === event.currentTarget) {
-      this.onCancel();
-    }
+    this.activeModal.close(true);
   }
 }
