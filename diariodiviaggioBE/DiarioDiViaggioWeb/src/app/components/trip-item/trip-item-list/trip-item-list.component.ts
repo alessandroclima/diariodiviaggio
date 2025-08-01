@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TripItem, TripItemService } from '../../../services/trip-item.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
@@ -17,9 +17,6 @@ export class TripItemListComponent implements OnInit {
   loading = true;
   error = false;
   
-  showAddForm = false;
-  editingItem: TripItem | null = null;
-  
   activeFilters: { [key: string]: boolean } = {
     Restaurant: true,
     Hotel: true,
@@ -29,6 +26,7 @@ export class TripItemListComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private tripItemService: TripItemService,
     private modal: NgbModal,
     private notificationService: NotificationService
@@ -68,33 +66,11 @@ export class TripItemListComponent implements OnInit {
   }
 
   openAddForm(): void {
-    this.showAddForm = true;
-    this.editingItem = null;
-  }
-
-  closeForm(): void {
-    this.showAddForm = false;
-    this.editingItem = null;
-  }
-
-  onSaveItem(item: TripItem): void {
-    if (this.editingItem) {
-      // Replace the edited item in the array
-      const index = this.tripItems.findIndex(i => i.id === item.id);
-      if (index !== -1) {
-        this.tripItems[index] = item;
-      }
-    } else {
-      // Add new item to the array
-      this.tripItems.unshift(item);
-    }
-    
-    this.closeForm();
+    this.router.navigate(['/trips', this.tripId, 'items', 'new']);
   }
 
   editItem(item: TripItem): void {
-    this.editingItem = item;
-    this.showAddForm = true;
+    this.router.navigate(['/trips', this.tripId, 'items', item.id]);
   }
 
   deleteItem(item: TripItem): void {

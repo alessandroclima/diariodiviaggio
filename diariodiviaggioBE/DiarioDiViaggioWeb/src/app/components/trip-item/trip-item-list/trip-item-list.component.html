@@ -5,7 +5,7 @@
       <i class="bi bi-arrow-left"></i>
     </button>
     <h2 class="mb-0">Travel Diary Entries</h2>
-    <button class="btn btn-primary" (click)="openAddForm()" *ngIf="!showAddForm">
+    <button class="btn btn-primary" (click)="openAddForm()">
       <i class="bi bi-plus-circle me-2"></i>
       Add Entry
     </button>
@@ -53,14 +53,7 @@
   </div>
 
   <!-- Add/Edit Form -->
-  <div class="mb-4" *ngIf="showAddForm">
-    <app-trip-item-form 
-      [tripId]="tripId"
-      [tripItem]="editingItem"
-      (saved)="onSaveItem($event)"
-      (cancelled)="closeForm()">
-    </app-trip-item-form>
-  </div>
+  <!-- Form is now displayed on a dedicated page instead of inline -->
 
   <!-- Loading State -->
   <div class="text-center py-5" *ngIf="loading">

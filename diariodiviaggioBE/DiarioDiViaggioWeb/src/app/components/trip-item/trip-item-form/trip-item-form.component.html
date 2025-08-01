@@ -3,7 +3,12 @@
     <div class="col-lg-8">
       <div class="card shadow-sm">
         <div class="card-header">
-          <h2 class="card-title mb-0">{{ isEdit ? 'Edit' : 'Add' }} Travel Diary Entry</h2>
+          <div class="d-flex align-items-center">
+            <button class="btn btn-outline-secondary me-3" (click)="onCancel()">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            <h2 class="card-title mb-0">{{ isEdit ? 'Edit' : 'Add' }} Travel Diary Entry</h2>
+          </div>
         </div>
         <div class="card-body">
           <form [formGroup]="tripItemForm" (ngSubmit)="onSubmit()">

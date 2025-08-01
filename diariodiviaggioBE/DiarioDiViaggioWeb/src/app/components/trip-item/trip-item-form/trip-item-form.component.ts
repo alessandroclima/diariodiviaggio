@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CreateTripItemRequest, TripItem, TripItemService, UpdateTripItemRequest } from '../../../services/trip-item.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NotificationService } from '../../../services/notification.service';
 
 @Component({
@@ -33,26 +33,49 @@ export class TripItemFormComponent implements OnInit {
     private fb: FormBuilder, 
     private tripItemService: TripItemService,
     private notificationService: NotificationService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      // Parse tripId from route parameters
+      const tripIdParam = params.get('tripId');
+      if (tripIdParam) {
+        this.tripId = parseInt(tripIdParam, 10);
+      }
 
-
-    
-    if(this.tripId <= 0) {
-       this.route.paramMap.subscribe(params => {
-        //parse tripId from route parameters
-        const tripIdParam = params.get('tripId');
-        if (tripIdParam) {
-          this.tripId = parseInt(tripIdParam, 10);
-        }
+      // Check if we're in edit mode by looking for an item ID
+      const itemIdParam = params.get('id');
+      if (itemIdParam) {
+        this.isEdit = true;
+        this.loadTripItem(parseInt(itemIdParam, 10));
+      } else {
+        this.isEdit = false;
+        this.initializeForm();
+      }
     });
-    }
-    // Check if tripItem is provided, if not, initialize it
-    console.log('Trip ID:', this.tripId);
-    this.isEdit = !!this.tripItem;
+  }
 
+  private loadTripItem(itemId: number): void {
+    this.tripItemService.getTripItem(itemId).subscribe({
+      next: (item) => {
+        this.tripItem = item;
+        console.log('Loaded trip item:', item);
+        this.initializeForm();
+        if (this.tripItem?.imageUrl) {
+          this.imagePreview = 'data:image/jpeg;base64,' + this.tripItem.imageUrl;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading trip item:', error);
+        this.notificationService.showError('Failed to load trip item');
+        this.router.navigate(['/trips', this.tripId, 'items']);
+      }
+    });
+  }
+
+  private initializeForm(): void {
     this.tripItemForm = this.fb.group({
       title: [this.tripItem?.title || '', [Validators.required, Validators.maxLength(100)]],
       description: [this.tripItem?.description || ''],
@@ -60,10 +83,6 @@ export class TripItemFormComponent implements OnInit {
       location: [this.tripItem?.location || ''],
       rating: [this.tripItem?.rating || null]
     });
-
-    if (this.isEdit && this.tripItem?.imageUrl) {
-      this.imagePreview = this.tripItem.imageUrl;
-    }
   }
 
   onFileSelected(event: Event): void {
@@ -110,7 +129,7 @@ export class TripItemFormComponent implements OnInit {
       next: (result) => {
         this.isSubmitting = false;
         this.notificationService.showSuccess('Trip item created successfully');
-        this.saved.emit(result);
+        this.router.navigate(['/trips', this.tripId, 'items']);
       },
       error: (error) => {
         this.isSubmitting = false;
@@ -136,7 +155,7 @@ export class TripItemFormComponent implements OnInit {
       next: (result) => {
         this.isSubmitting = false;
         this.notificationService.showSuccess('Trip item updated successfully');
-        this.saved.emit(result);
+        this.router.navigate(['/trips', this.tripId, 'items']);
       },
       error: (error) => {
         this.isSubmitting = false;
@@ -147,6 +166,6 @@ export class TripItemFormComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.cancelled.emit();
+    this.router.navigate(['/trips', this.tripId, 'items']);
   }
 }
