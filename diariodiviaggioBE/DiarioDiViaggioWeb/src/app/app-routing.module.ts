@@ -14,6 +14,7 @@ import { LuggageDetailComponent } from './components/luggage/luggage-detail/lugg
 import { ItineraryCalendarComponent } from './components/itinerary/itinerary-calendar/itinerary-calendar.component';
 import { ItineraryFormComponent } from './components/itinerary/itinerary-form/itinerary-form.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { DebugAuthComponent } from './components/debug-auth/debug-auth.component';
 
 import { AuthGuard } from './guards/auth.guard';
 
@@ -24,6 +25,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'debug-auth', component: DebugAuthComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'trips', component: TripListComponent, canActivate: [AuthGuard] },
   { path: 'trips/new', component: TripDetailComponent, canActivate: [AuthGuard] },

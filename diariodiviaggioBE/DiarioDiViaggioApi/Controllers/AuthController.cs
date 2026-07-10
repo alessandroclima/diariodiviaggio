@@ -58,11 +58,32 @@ public class AuthController : ControllerBase
     {
         try
         {
+            // Add debugging information
+            var isDevelopment = HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment();
+            if (isDevelopment)
+            {
+                Console.WriteLine("=== Refresh Token Request Debug ===");
+                Console.WriteLine($"Request Origin: {Request.Headers["Origin"]}");
+                Console.WriteLine($"Request Host: {Request.Host}");
+                Console.WriteLine($"Available Cookies: {string.Join(", ", Request.Cookies.Keys)}");
+                Console.WriteLine($"User-Agent: {Request.Headers["User-Agent"]}");
+            }
+            
             // Get refresh token from HttpOnly cookie
             var refreshToken = Request.Cookies["refreshToken"];
             if (string.IsNullOrEmpty(refreshToken))
             {
+                if (isDevelopment)
+                {
+                    Console.WriteLine("ERROR: Refresh token cookie not found or empty");
+                    Console.WriteLine($"All cookies received: {string.Join("; ", Request.Cookies.Select(c => $"{c.Key}={c.Value}"))}");
+                }
                 return BadRequest(new { message = "Refresh token not found" });
+            }
+
+            if (isDevelopment)
+            {
+                Console.WriteLine($"Found refresh token cookie: {refreshToken[..Math.Min(10, refreshToken.Length)]}...");
             }
 
             var refreshTokenDto = new RefreshTokenDto { RefreshToken = refreshToken };
@@ -71,6 +92,11 @@ public class AuthController : ControllerBase
             // Set new refresh token as HttpOnly cookie
             SetRefreshTokenCookie(newRefreshToken);
             
+            if (isDevelopment)
+            {
+                Console.WriteLine("Successfully refreshed token and set new cookie");
+            }
+            
             // Return only the new access token
             return Ok(new { Token = accessToken });
         }
@@ -78,6 +104,7 @@ public class AuthController : ControllerBase
         {
             // Clear the invalid refresh token cookie
             ClearRefreshTokenCookie();
+            Console.WriteLine($"Refresh token error: {ex.Message}");
             return BadRequest(new { message = ex.Message });
         }
     }
@@ -109,25 +136,35 @@ public class AuthController : ControllerBase
 
     private void SetRefreshTokenCookie(string refreshToken)
     {
+        var isDevelopment = HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment();
+        
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = Request.IsHttps, // Only secure over HTTPS, allow HTTP in development
-            SameSite = SameSiteMode.Strict,
+            Secure = !isDevelopment, // Only require HTTPS in production
+            SameSite = SameSiteMode.None, // Allow cross-origin requests
             Expires = DateTimeOffset.UtcNow.AddDays(7), // 7 days expiration
             Path = "/"
         };
 
         Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+        
+        // Add debugging in development
+        if (isDevelopment)
+        {
+            Console.WriteLine($"Setting refresh token cookie with options: HttpOnly={cookieOptions.HttpOnly}, Secure={cookieOptions.Secure}, SameSite={cookieOptions.SameSite}");
+        }
     }
 
     private void ClearRefreshTokenCookie()
     {
+        var isDevelopment = HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment();
+        
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = Request.IsHttps,
-            SameSite = SameSiteMode.Strict,
+            Secure = !isDevelopment, // Only require HTTPS in production
+            SameSite = SameSiteMode.None, // Allow cross-origin requests
             Expires = DateTimeOffset.UtcNow.AddDays(-1), // Expire immediately
             Path = "/"
         };
@@ -172,6 +209,20 @@ public class AuthController : ControllerBase
             // Log the exception but don't expose details to client
             return StatusCode(500, new { message = "An error occurred while resetting your password." });
         }
+    }
+
+    [HttpGet("test-cookie")]
+    public ActionResult TestCookie()
+    {
+        var cookie = Request.Cookies["refreshToken"];
+        return Ok(new { 
+            cookieExists = !string.IsNullOrEmpty(cookie),
+            cookieValue = cookie?.Length > 10 ? cookie.Substring(0, 10) + "..." : cookie,
+            allCookies = Request.Cookies.Keys.ToList(),
+            origin = Request.Headers["Origin"].ToString(),
+            userAgent = Request.Headers["User-Agent"].ToString(),
+            requestHeaders = Request.Headers.ToDictionary(h => h.Key, h => h.Value.ToString())
+        });
     }
 
     private string GetClientIpAddress()

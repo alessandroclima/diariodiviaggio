@@ -59,9 +59,17 @@ export class AuthService {
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
+    console.log('Making login request to:', `${this.apiUrl}/login`);
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request, { withCredentials: true })
       .pipe(
-        tap(response => this.handleAuthentication(response))
+        tap(response => {
+          console.log('Login successful, handling authentication');
+          this.handleAuthentication(response);
+          // Check if cookies were set after login
+          setTimeout(() => {
+            console.log('Cookies after login:', document.cookie);
+          }, 100);
+        })
       );
   }
 
@@ -113,12 +121,23 @@ export class AuthService {
   }
 
   refreshToken(): Observable<{token: string}> {
+    console.log('Making refresh token request to:', `${this.apiUrl}/refresh`);
+    console.log('Current domain:', window.location.hostname);
+    console.log('Current protocol:', window.location.protocol);
+    console.log('Available cookies:', document.cookie);
+    
     // HttpOnly cookie will be sent automatically with the request
     return this.http.post<{token: string}>(`${this.apiUrl}/refresh`, {}, { withCredentials: true }).pipe(
       tap(response => {
         // Only store the new JWT token, refresh token is handled by HttpOnly cookie
         localStorage.setItem(this.tokenKey, response.token);
         console.log('Token refreshed successfully');
+      }),
+      catchError(error => {
+        console.error('Refresh token error:', error);
+        console.log('Response status:', error.status);
+        console.log('Response body:', error.error);
+        throw error;
       })
     );
   }

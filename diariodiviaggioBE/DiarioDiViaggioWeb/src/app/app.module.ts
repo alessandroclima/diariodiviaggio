@@ -32,6 +32,8 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { ItineraryCalendarComponent } from './components/itinerary/itinerary-calendar/itinerary-calendar.component';
 import { ItineraryFormComponent } from './components/itinerary/itinerary-form/itinerary-form.component';
+import { DebugAuthComponent } from './debug-auth.component';
+
 
 @NgModule({
   declarations: [
@@ -50,7 +52,8 @@ import { ItineraryFormComponent } from './components/itinerary/itinerary-form/it
     ForgotPasswordComponent,
     ResetPasswordComponent,
     ItineraryCalendarComponent,
-    ItineraryFormComponent
+    ItineraryFormComponent,
+    DebugAuthComponent
   ],
   imports: [
     BrowserModule,
