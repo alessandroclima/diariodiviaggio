@@ -10,8 +10,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const String defaultApiBaseUrl = String.fromEnvironment(
   'API_BASE_URL',
-  defaultValue: 'http://10.0.2.2:5106',
+  defaultValue:
+      'https://diariodiviaggioapi-b0edhndsbahwepag.italynorth-01.azurewebsites.net',
 );
+
+String _normalizeApiBaseUrl(String rawBaseUrl) {
+  final trimmed = rawBaseUrl.trim().replaceFirst(RegExp(r'/+$'), '');
+  return trimmed.replaceFirst(RegExp(r'/api$', caseSensitive: false), '');
+}
 
 void main() {
   runApp(
@@ -172,7 +178,7 @@ class ApiClient {
   ApiClient()
     : _dio = Dio(
         BaseOptions(
-          baseUrl: defaultApiBaseUrl,
+          baseUrl: _normalizeApiBaseUrl(defaultApiBaseUrl),
           connectTimeout: const Duration(seconds: 20),
           receiveTimeout: const Duration(seconds: 20),
         ),
@@ -182,12 +188,33 @@ class ApiClient {
 
   String _errorToMessage(Object error) {
     if (error is DioException) {
+      final status = error.response?.statusCode;
+      final method = error.requestOptions.method;
+      final path = error.requestOptions.path;
       final data = error.response?.data;
       if (data is Map && data['message'] != null) {
         return data['message'].toString();
       }
       if (data is String && data.isNotEmpty) {
+        if (status == 404) {
+          return 'Endpoint non trovato (404): $method $path. Verifica che il backend pubblicato esponga questa API.';
+        }
+        if (status == 401) {
+          return 'Sessione non autorizzata (401). Effettua di nuovo l\'accesso.';
+        }
+        if (status == 403) {
+          return 'Operazione non consentita (403).';
+        }
         return data;
+      }
+      if (status == 404) {
+        return 'Endpoint non trovato (404): $method $path. Verifica che il backend pubblicato esponga questa API.';
+      }
+      if (status == 401) {
+        return 'Sessione non autorizzata (401). Effettua di nuovo l\'accesso.';
+      }
+      if (status == 403) {
+        return 'Operazione non consentita (403).';
       }
       return error.message ?? 'Richiesta non riuscita';
     }
@@ -1052,7 +1079,19 @@ class _AuthScreenState extends State<AuthScreen> {
   final emailCtrl = TextEditingController();
   final passwordCtrl = TextEditingController();
   final userCtrl = TextEditingController();
+  final emailFocus = FocusNode();
+  final passwordFocus = FocusNode();
   bool loading = false;
+
+  @override
+  void dispose() {
+    emailCtrl.dispose();
+    passwordCtrl.dispose();
+    userCtrl.dispose();
+    emailFocus.dispose();
+    passwordFocus.dispose();
+    super.dispose();
+  }
 
   Future<void> _submit() async {
     setState(() => loading = true);
@@ -1152,12 +1191,36 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(height: 10),
                     TextField(
                       controller: emailCtrl,
+                      focusNode: emailFocus,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      selectAllOnFocus: false,
+                      enableInteractiveSelection: false,
+                      autofillHints: const [AutofillHints.email],
+                      onTap: () {
+                        if (!emailFocus.hasFocus) {
+                          emailFocus.requestFocus();
+                        }
+                        SystemChannels.textInput.invokeMethod<void>(
+                          'TextInput.show',
+                        );
+                      },
+                      onSubmitted: (_) =>
+                          FocusScope.of(context).requestFocus(passwordFocus),
                       decoration: const InputDecoration(labelText: 'Email'),
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       controller: passwordCtrl,
+                      focusNode: passwordFocus,
                       obscureText: true,
+                      textInputAction: TextInputAction.done,
+                      autofillHints: const [AutofillHints.password],
+                      onSubmitted: (_) {
+                        if (!loading) {
+                          _submit();
+                        }
+                      },
                       decoration: const InputDecoration(labelText: 'Password'),
                     ),
                     const SizedBox(height: 14),
