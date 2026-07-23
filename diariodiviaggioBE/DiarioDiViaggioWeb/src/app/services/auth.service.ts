@@ -17,6 +17,7 @@ export interface LoginRequest {
 
 export interface AuthResponse {
   token: string;
+  refreshToken?: string;
   username: string;
   email: string;
   profileImageBase64?: string;
@@ -38,38 +39,43 @@ export interface PasswordReset {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/api/auth`;
   private tokenKey = 'auth_token';
+  private refreshTokenKey = 'refresh_token';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   private isLoggingOut = false; // Prevent multiple logout calls
-  
+
   constructor(private http: HttpClient) {
     this.loadUserFromStorage();
   }
 
   register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, request, { withCredentials: true })
-      .pipe(
-        tap(response => this.handleAuthentication(response))
-      );
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/register`, request, {
+        withCredentials: true,
+      })
+      .pipe(tap((response) => this.handleAuthentication(response)));
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
     console.log('Making login request to:', `${this.apiUrl}/login`);
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request, { withCredentials: true })
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/login`, request, {
+        withCredentials: true,
+      })
       .pipe(
-        tap(response => {
+        tap((response) => {
           console.log('Login successful, handling authentication');
           this.handleAuthentication(response);
           // Check if cookies were set after login
           setTimeout(() => {
             console.log('Cookies after login:', document.cookie);
           }, 100);
-        })
+        }),
       );
   }
 
@@ -79,14 +85,14 @@ export class AuthService {
       console.log('Logout already in progress');
       return;
     }
-    
+
     this.isLoggingOut = true;
     console.log('Starting logout process');
-    
+
     // Always clear local storage immediately to prevent UI issues
     this.clearLocalStorage();
     this.currentUserSubject.next(null);
-    
+
     // Try to revoke the refresh token on the server (best effort)
     this.revokeRefreshToken().subscribe({
       next: () => {
@@ -99,17 +105,24 @@ export class AuthService {
       complete: () => {
         this.isLoggingOut = false;
         console.log('Logout process completed');
-      }
+      },
     });
   }
 
   private clearLocalStorage(): void {
     console.log('Clearing localStorage...');
-    console.log('Before clear - token exists:', !!localStorage.getItem(this.tokenKey));
-    
+    console.log(
+      'Before clear - token exists:',
+      !!localStorage.getItem(this.tokenKey),
+    );
+
     localStorage.removeItem(this.tokenKey);
-    
-    console.log('After clear - token exists:', !!localStorage.getItem(this.tokenKey));
+    localStorage.removeItem(this.refreshTokenKey);
+
+    console.log(
+      'After clear - token exists:',
+      !!localStorage.getItem(this.tokenKey),
+    );
   }
 
   isLoggedIn(): boolean {
@@ -120,51 +133,71 @@ export class AuthService {
     return localStorage.getItem(this.tokenKey);
   }
 
-  refreshToken(): Observable<{token: string}> {
+  refreshToken(): Observable<{ token: string; refreshToken?: string }> {
     console.log('Making refresh token request to:', `${this.apiUrl}/refresh`);
     console.log('Current domain:', window.location.hostname);
     console.log('Current protocol:', window.location.protocol);
     console.log('Available cookies:', document.cookie);
-    
-    // HttpOnly cookie will be sent automatically with the request
-    return this.http.post<{token: string}>(`${this.apiUrl}/refresh`, {}, { withCredentials: true }).pipe(
-      tap(response => {
-        // Only store the new JWT token, refresh token is handled by HttpOnly cookie
-        localStorage.setItem(this.tokenKey, response.token);
-        console.log('Token refreshed successfully');
-      }),
-      catchError(error => {
-        console.error('Refresh token error:', error);
-        console.log('Response status:', error.status);
-        console.log('Response body:', error.error);
-        throw error;
-      })
-    );
+
+    const refreshToken = localStorage.getItem(this.refreshTokenKey);
+
+    // HttpOnly cookie will be sent automatically with the request.
+    // Body token is a fallback for clients/environments where cookies are blocked.
+    return this.http
+      .post<{
+        token: string;
+        refreshToken?: string;
+      }>(`${this.apiUrl}/refresh`, { refreshToken }, { withCredentials: true })
+      .pipe(
+        tap((response) => {
+          localStorage.setItem(this.tokenKey, response.token);
+          if (response.refreshToken) {
+            localStorage.setItem(this.refreshTokenKey, response.refreshToken);
+          }
+          console.log('Token refreshed successfully');
+        }),
+        catchError((error) => {
+          console.error('Refresh token error:', error);
+          console.log('Response status:', error.status);
+          console.log('Response body:', error.error);
+          throw error;
+        }),
+      );
   }
 
   private revokeRefreshToken(): Observable<any> {
     console.log('Attempting to revoke refresh token via HttpOnly cookie');
-    
-    // HttpOnly cookie will be sent automatically with the request
+    const refreshToken = localStorage.getItem(this.refreshTokenKey);
+
+    // HttpOnly cookie will be sent automatically with the request.
+    // Body token is a fallback for clients/environments where cookies are blocked.
     console.log('Sending revoke request to:', `${this.apiUrl}/revoke`);
-    return this.http.post(`${this.apiUrl}/revoke`, {}, { withCredentials: true }).pipe(
-      tap(response => {
-        console.log('Revoke response:', response);
-      }),
-      catchError((error) => {
-        console.error('Revoke error:', error);
-        return of(null); // Don't fail logout if revoke fails
-      })
-    );
+    return this.http
+      .post(
+        `${this.apiUrl}/revoke`,
+        { refreshToken },
+        { withCredentials: true },
+      )
+      .pipe(
+        tap((response) => {
+          console.log('Revoke response:', response);
+        }),
+        catchError((error) => {
+          console.error('Revoke error:', error);
+          return of(null); // Don't fail logout if revoke fails
+        }),
+      );
   }
 
   private handleAuthentication(response: AuthResponse): void {
-    // Only store JWT token, refresh token is handled by HttpOnly cookie
     localStorage.setItem(this.tokenKey, response.token);
+    if (response.refreshToken) {
+      localStorage.setItem(this.refreshTokenKey, response.refreshToken);
+    }
     const user: User = {
       username: response.username,
       email: response.email,
-      profileImageBase64: response.profileImageBase64
+      profileImageBase64: response.profileImageBase64,
     };
     this.currentUserSubject.next(user);
   }
@@ -176,7 +209,7 @@ export class AuthService {
       const user: User = {
         username: payload.unique_name,
         email: payload.email,
-        profileImageBase64: undefined // Will be loaded separately if needed
+        profileImageBase64: undefined, // Will be loaded separately if needed
       };
       this.currentUserSubject.next(user);
     }
@@ -186,11 +219,21 @@ export class AuthService {
     this.currentUserSubject.next(user);
   }
 
-  requestPasswordReset(request: PasswordResetRequest): Observable<{message: string}> {
-    return this.http.post<{message: string}>(`${this.apiUrl}/forgot-password`, request, { withCredentials: true });
+  requestPasswordReset(
+    request: PasswordResetRequest,
+  ): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${this.apiUrl}/forgot-password`,
+      request,
+      { withCredentials: true },
+    );
   }
 
-  resetPassword(resetData: PasswordReset): Observable<{message: string}> {
-    return this.http.post<{message: string}>(`${this.apiUrl}/reset-password`, resetData, { withCredentials: true });
+  resetPassword(resetData: PasswordReset): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${this.apiUrl}/reset-password`,
+      resetData,
+      { withCredentials: true },
+    );
   }
 }

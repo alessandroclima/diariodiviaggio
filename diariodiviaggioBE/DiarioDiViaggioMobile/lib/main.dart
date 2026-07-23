@@ -92,6 +92,7 @@ class SessionStore extends ChangeNotifier {
 
   final ApiClient _apiClient;
   String? token;
+  String? refreshToken;
   String? username;
   String? email;
   String? profileImageBase64;
@@ -101,20 +102,45 @@ class SessionStore extends ChangeNotifier {
   Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
     token = prefs.getString('token');
+    refreshToken = prefs.getString('refreshToken');
     username = prefs.getString('username');
     email = prefs.getString('email');
     profileImageBase64 = prefs.getString('profileImageBase64');
+
+    if (isAuthenticated) {
+      try {
+        final refreshed = await _apiClient.refreshToken(refreshToken);
+        token = refreshed.token;
+        refreshToken = refreshed.refreshToken;
+        await prefs.setString('token', refreshed.token);
+        await prefs.setString('refreshToken', refreshed.refreshToken);
+      } catch (_) {
+        token = null;
+        refreshToken = null;
+        username = null;
+        email = null;
+        profileImageBase64 = null;
+        await prefs.remove('token');
+        await prefs.remove('refreshToken');
+        await prefs.remove('username');
+        await prefs.remove('email');
+        await prefs.remove('profileImageBase64');
+      }
+    }
+
     notifyListeners();
   }
 
   Future<void> _saveAuth(AuthResponse auth) async {
     token = auth.token;
+    refreshToken = auth.refreshToken;
     username = auth.username;
     email = auth.email;
     profileImageBase64 = auth.profileImageBase64;
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', auth.token);
+    await prefs.setString('refreshToken', auth.refreshToken);
     await prefs.setString('username', auth.username);
     await prefs.setString('email', auth.email);
     if (auth.profileImageBase64 != null) {
@@ -142,16 +168,18 @@ class SessionStore extends ChangeNotifier {
   Future<void> logout() async {
     try {
       if (token != null) {
-        await _apiClient.revokeToken(token!);
+        await _apiClient.revokeToken(token!, refreshToken);
       }
     } catch (_) {}
 
     token = null;
+    refreshToken = null;
     username = null;
     email = null;
     profileImageBase64 = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
+    await prefs.remove('refreshToken');
     await prefs.remove('username');
     await prefs.remove('email');
     await prefs.remove('profileImageBase64');
@@ -271,8 +299,24 @@ class ApiClient {
     }
   }
 
-  Future<void> revokeToken(String token) async {
-    await _dio.post('/api/auth/revoke', options: _auth(token));
+  Future<RefreshSessionResponse> refreshToken(String? refreshToken) async {
+    try {
+      final res = await _dio.post<Map<String, dynamic>>(
+        '/api/auth/refresh',
+        data: {'refreshToken': refreshToken},
+      );
+      return RefreshSessionResponse.fromJson(res.data ?? {});
+    } catch (e) {
+      throw Exception(_errorToMessage(e));
+    }
+  }
+
+  Future<void> revokeToken(String token, String? refreshToken) async {
+    await _dio.post(
+      '/api/auth/revoke',
+      data: {'refreshToken': refreshToken},
+      options: _auth(token),
+    );
   }
 
   Future<List<Trip>> getTrips(String token) async {
@@ -602,22 +646,38 @@ class ApiClient {
 class AuthResponse {
   AuthResponse({
     required this.token,
+    required this.refreshToken,
     required this.username,
     required this.email,
     this.profileImageBase64,
   });
 
   final String token;
+  final String refreshToken;
   final String username;
   final String email;
   final String? profileImageBase64;
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) => AuthResponse(
     token: (json['token'] ?? json['Token'] ?? '').toString(),
+    refreshToken: (json['refreshToken'] ?? '').toString(),
     username: (json['username'] ?? '').toString(),
     email: (json['email'] ?? '').toString(),
     profileImageBase64: json['profileImageBase64']?.toString(),
   );
+}
+
+class RefreshSessionResponse {
+  RefreshSessionResponse({required this.token, required this.refreshToken});
+
+  final String token;
+  final String refreshToken;
+
+  factory RefreshSessionResponse.fromJson(Map<String, dynamic> json) =>
+      RefreshSessionResponse(
+        token: (json['token'] ?? json['Token'] ?? '').toString(),
+        refreshToken: (json['refreshToken'] ?? '').toString(),
+      );
 }
 
 class Trip {

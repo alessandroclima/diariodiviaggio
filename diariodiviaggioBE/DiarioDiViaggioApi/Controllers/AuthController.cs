@@ -54,7 +54,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public async Task<ActionResult> RefreshToken()
+    public async Task<ActionResult<RefreshTokenResponseDto>> RefreshToken([FromBody] RefreshTokenDto? refreshTokenDto)
     {
         try
         {
@@ -69,8 +69,13 @@ public class AuthController : ControllerBase
                 Console.WriteLine($"User-Agent: {Request.Headers["User-Agent"]}");
             }
             
-            // Get refresh token from HttpOnly cookie
+            // Prefer HttpOnly cookie, fallback to request body for clients that cannot use cookies reliably.
             var refreshToken = Request.Cookies["refreshToken"];
+            if (string.IsNullOrWhiteSpace(refreshToken))
+            {
+                refreshToken = refreshTokenDto?.RefreshToken;
+            }
+
             if (string.IsNullOrEmpty(refreshToken))
             {
                 if (isDevelopment)
@@ -86,8 +91,7 @@ public class AuthController : ControllerBase
                 Console.WriteLine($"Found refresh token cookie: {refreshToken[..Math.Min(10, refreshToken.Length)]}...");
             }
 
-            var refreshTokenDto = new RefreshTokenDto { RefreshToken = refreshToken };
-            var (accessToken, newRefreshToken) = await _authService.RefreshTokenAsync(refreshTokenDto);
+            var (accessToken, newRefreshToken) = await _authService.RefreshTokenAsync(refreshToken);
             
             // Set new refresh token as HttpOnly cookie
             SetRefreshTokenCookie(newRefreshToken);
@@ -97,8 +101,11 @@ public class AuthController : ControllerBase
                 Console.WriteLine("Successfully refreshed token and set new cookie");
             }
             
-            // Return only the new access token
-            return Ok(new { Token = accessToken });
+            return Ok(new RefreshTokenResponseDto
+            {
+                Token = accessToken,
+                RefreshToken = newRefreshToken
+            });
         }
         catch (InvalidOperationException ex)
         {
@@ -110,12 +117,17 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("revoke")]
-    public async Task<ActionResult> RevokeToken()
+    public async Task<ActionResult> RevokeToken([FromBody] RefreshTokenDto? refreshTokenDto)
     {
         try
         {
-            // Get refresh token from HttpOnly cookie
+            // Prefer HttpOnly cookie, fallback to request body for clients that cannot use cookies reliably.
             var refreshToken = Request.Cookies["refreshToken"];
+            if (string.IsNullOrWhiteSpace(refreshToken))
+            {
+                refreshToken = refreshTokenDto?.RefreshToken;
+            }
+
             if (string.IsNullOrEmpty(refreshToken))
             {
                 return BadRequest(new { message = "Refresh token not found" });

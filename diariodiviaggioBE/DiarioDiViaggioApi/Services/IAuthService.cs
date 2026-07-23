@@ -6,7 +6,7 @@ public interface IAuthService
 {
     Task<(AuthResponseDto response, string refreshToken)> RegisterAsync(RegisterDto registerDto);
     Task<(AuthResponseDto response, string refreshToken)> LoginAsync(LoginDto loginDto);
-    Task<(string accessToken, string refreshToken)> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
+    Task<(string accessToken, string refreshToken)> RefreshTokenAsync(string refreshToken);
     Task RevokeRefreshTokenAsync(string refreshToken);
     Task<string> GenerateJwtToken(Models.User user);
     Task RequestPasswordResetAsync(PasswordResetRequestDto request, string ipAddress);

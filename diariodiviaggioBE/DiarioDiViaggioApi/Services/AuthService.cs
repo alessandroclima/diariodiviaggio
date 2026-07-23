@@ -56,7 +56,8 @@ public class AuthService : IAuthService
             Token = token,
             Username = user.Username,
             Email = user.Email,
-            ProfileImageBase64 = user.ProfileImage != null ? Convert.ToBase64String(user.ProfileImage) : null
+            ProfileImageBase64 = user.ProfileImage != null ? Convert.ToBase64String(user.ProfileImage) : null,
+            RefreshToken = refreshTokenEntity.Token
         };
 
         return (response, refreshTokenEntity.Token);
@@ -80,17 +81,18 @@ public class AuthService : IAuthService
             Token = token,
             Username = user.Username,
             Email = user.Email,
-            ProfileImageBase64 = user.ProfileImage != null ? Convert.ToBase64String(user.ProfileImage) : null
+            ProfileImageBase64 = user.ProfileImage != null ? Convert.ToBase64String(user.ProfileImage) : null,
+            RefreshToken = refreshTokenEntity.Token
         };
 
         return (response, refreshTokenEntity.Token);
     }
 
-    public async Task<(string accessToken, string refreshToken)> RefreshTokenAsync(RefreshTokenDto refreshTokenDto)
+    public async Task<(string accessToken, string refreshToken)> RefreshTokenAsync(string refreshTokenValue)
     {
         var refreshToken = await _context.RefreshTokens
             .Include(rt => rt.User)
-            .FirstOrDefaultAsync(rt => rt.Token == refreshTokenDto.RefreshToken);
+            .FirstOrDefaultAsync(rt => rt.Token == refreshTokenValue);
 
         if (refreshToken == null || !refreshToken.IsActive)
         {
