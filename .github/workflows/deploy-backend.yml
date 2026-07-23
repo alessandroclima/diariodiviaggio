@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "DiarioDiViaggioApi/**"
+      - "diariodiviaggioBE/DiarioDiViaggioApi/**"
       - ".github/workflows/deploy-backend.yml"
   workflow_dispatch:
 
@@ -13,7 +13,6 @@ permissions:
 
 env:
   DOTNET_VERSION: "9.0.x"
-  PROJECT_PATH: "DiarioDiViaggioApi/DiarioDiViaggioApi.csproj"
   PUBLISH_PATH: "${{ github.workspace }}/publish_output"
 
 jobs:
@@ -29,14 +28,26 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
+      - name: Locate backend project
+        id: locate-project
+        shell: bash
+        run: |
+          PROJECT_PATH="$(find . -type f -name 'DiarioDiViaggioApi.csproj' | head -n 1)"
+          if [ -z "$PROJECT_PATH" ]; then
+            echo "DiarioDiViaggioApi.csproj not found"
+            exit 1
+          fi
+          echo "Using project: $PROJECT_PATH"
+          echo "project_path=${PROJECT_PATH#./}" >> "$GITHUB_OUTPUT"
+
       - name: Restore dependencies
-        run: dotnet restore ${{ env.PROJECT_PATH }}
+        run: dotnet restore ${{ steps.locate-project.outputs.project_path }}
 
       - name: Build
-        run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
+        run: dotnet build ${{ steps.locate-project.outputs.project_path }} --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish ${{ env.PROJECT_PATH }} --configuration Release --no-build --output ${{ env.PUBLISH_PATH }}
+        run: dotnet publish ${{ steps.locate-project.outputs.project_path }} --configuration Release --no-build --output ${{ env.PUBLISH_PATH }}
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
