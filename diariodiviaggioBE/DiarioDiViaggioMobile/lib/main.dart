@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -103,6 +104,7 @@ class SessionStore extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     token = prefs.getString('token');
     refreshToken = prefs.getString('refreshToken');
+    _apiClient.hydrateAuthTokens(token: token, refreshToken: refreshToken);
     username = prefs.getString('username');
     email = prefs.getString('email');
     profileImageBase64 = prefs.getString('profileImageBase64');
@@ -112,6 +114,10 @@ class SessionStore extends ChangeNotifier {
         final refreshed = await _apiClient.refreshToken(refreshToken);
         token = refreshed.token;
         refreshToken = refreshed.refreshToken;
+        _apiClient.hydrateAuthTokens(
+          token: refreshed.token,
+          refreshToken: refreshed.refreshToken,
+        );
         await prefs.setString('token', refreshed.token);
         await prefs.setString('refreshToken', refreshed.refreshToken);
       } catch (_) {
@@ -125,6 +131,7 @@ class SessionStore extends ChangeNotifier {
         await prefs.remove('username');
         await prefs.remove('email');
         await prefs.remove('profileImageBase64');
+        _apiClient.hydrateAuthTokens(token: null, refreshToken: null);
       }
     }
 
@@ -134,6 +141,10 @@ class SessionStore extends ChangeNotifier {
   Future<void> _saveAuth(AuthResponse auth) async {
     token = auth.token;
     refreshToken = auth.refreshToken;
+    _apiClient.hydrateAuthTokens(
+      token: auth.token,
+      refreshToken: auth.refreshToken,
+    );
     username = auth.username;
     email = auth.email;
     profileImageBase64 = auth.profileImageBase64;
@@ -167,8 +178,13 @@ class SessionStore extends ChangeNotifier {
 
   Future<void> logout() async {
     try {
-      if (token != null) {
-        await _apiClient.revokeToken(token!, refreshToken);
+      final prefs = await SharedPreferences.getInstance();
+      final latestToken = prefs.getString('token') ?? token;
+      final latestRefreshToken =
+          prefs.getString('refreshToken') ?? refreshToken;
+
+      if (latestToken != null && latestToken.isNotEmpty) {
+        await _apiClient.revokeToken(latestToken, latestRefreshToken);
       }
     } catch (_) {}
 
@@ -183,6 +199,7 @@ class SessionStore extends ChangeNotifier {
     await prefs.remove('username');
     await prefs.remove('email');
     await prefs.remove('profileImageBase64');
+    _apiClient.hydrateAuthTokens(token: null, refreshToken: null);
     notifyListeners();
   }
 
@@ -210,9 +227,99 @@ class ApiClient {
           connectTimeout: const Duration(seconds: 20),
           receiveTimeout: const Duration(seconds: 20),
         ),
-      );
+      ) {
+    _setupAuthInterceptor();
+  }
 
   final Dio _dio;
+  String? _currentAccessToken;
+  String? _currentRefreshToken;
+  Completer<void>? _refreshCompleter;
+
+  void hydrateAuthTokens({String? token, String? refreshToken}) {
+    _currentAccessToken = token;
+    _currentRefreshToken = refreshToken;
+  }
+
+  void _setupAuthInterceptor() {
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onError: (error, handler) async {
+          if (_shouldAttemptRefresh(error)) {
+            try {
+              await _refreshAccessTokenInternal();
+
+              final requestOptions = error.requestOptions;
+              final retryHeaders = Map<String, dynamic>.from(
+                requestOptions.headers,
+              );
+              retryHeaders['Authorization'] = 'Bearer $_currentAccessToken';
+
+              final retryOptions = requestOptions.copyWith(
+                headers: retryHeaders,
+              );
+              final response = await _dio.fetch(retryOptions);
+              handler.resolve(response);
+              return;
+            } catch (_) {
+              // If refresh fails, return original 401 so upper layers can handle logout.
+            }
+          }
+
+          handler.next(error);
+        },
+      ),
+    );
+  }
+
+  bool _shouldAttemptRefresh(DioException error) {
+    if (error.response?.statusCode != 401) {
+      return false;
+    }
+
+    final requestPath = error.requestOptions.path.toLowerCase();
+    if (requestPath.contains('/api/auth/login') ||
+        requestPath.contains('/api/auth/register') ||
+        requestPath.contains('/api/auth/refresh') ||
+        requestPath.contains('/api/auth/revoke')) {
+      return false;
+    }
+
+    final authHeader = error.requestOptions.headers['Authorization']
+        ?.toString();
+    return authHeader != null && authHeader.startsWith('Bearer ');
+  }
+
+  Future<void> _refreshAccessTokenInternal() async {
+    if (_refreshCompleter != null) {
+      return _refreshCompleter!.future;
+    }
+
+    final completer = Completer<void>();
+    _refreshCompleter = completer;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final tokenFromStorage = prefs.getString('refreshToken');
+      final refreshToken = tokenFromStorage ?? _currentRefreshToken;
+
+      if (refreshToken == null || refreshToken.isEmpty) {
+        throw Exception('Refresh token non disponibile');
+      }
+
+      final refreshed = await this.refreshToken(refreshToken);
+      await prefs.setString('token', refreshed.token);
+      await prefs.setString('refreshToken', refreshed.refreshToken);
+      _currentAccessToken = refreshed.token;
+      _currentRefreshToken = refreshed.refreshToken;
+      completer.complete();
+    } catch (e) {
+      completer.completeError(e);
+      rethrow;
+    } finally {
+      _refreshCompleter = null;
+    }
+  }
 
   String _errorToMessage(Object error) {
     if (error is DioException) {
@@ -249,8 +356,12 @@ class ApiClient {
     return 'Errore inatteso';
   }
 
-  Options _auth(String token) =>
-      Options(headers: {'Authorization': 'Bearer $token'});
+  Options _auth(String token) => Options(
+    headers: {
+      'Authorization':
+          'Bearer ${_currentAccessToken?.isNotEmpty == true ? _currentAccessToken : token}',
+    },
+  );
 
   Future<AuthResponse> register(
     String username,
@@ -262,7 +373,10 @@ class ApiClient {
         '/api/auth/register',
         data: {'username': username, 'email': email, 'password': password},
       );
-      return AuthResponse.fromJson(res.data ?? {});
+      final auth = AuthResponse.fromJson(res.data ?? {});
+      _currentAccessToken = auth.token;
+      _currentRefreshToken = auth.refreshToken;
+      return auth;
     } catch (e) {
       throw Exception(_errorToMessage(e));
     }
@@ -274,7 +388,10 @@ class ApiClient {
         '/api/auth/login',
         data: {'email': email, 'password': password},
       );
-      return AuthResponse.fromJson(res.data ?? {});
+      final auth = AuthResponse.fromJson(res.data ?? {});
+      _currentAccessToken = auth.token;
+      _currentRefreshToken = auth.refreshToken;
+      return auth;
     } catch (e) {
       throw Exception(_errorToMessage(e));
     }
@@ -305,7 +422,10 @@ class ApiClient {
         '/api/auth/refresh',
         data: {'refreshToken': refreshToken},
       );
-      return RefreshSessionResponse.fromJson(res.data ?? {});
+      final refreshed = RefreshSessionResponse.fromJson(res.data ?? {});
+      _currentAccessToken = refreshed.token;
+      _currentRefreshToken = refreshed.refreshToken;
+      return refreshed;
     } catch (e) {
       throw Exception(_errorToMessage(e));
     }
