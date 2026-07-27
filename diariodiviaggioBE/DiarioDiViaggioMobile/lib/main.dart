@@ -2739,6 +2739,7 @@ class _LuggageDetailScreenState extends State<LuggageDetailScreen> {
   late Luggage luggage;
   bool isSaving = false;
   bool isLoading = false;
+  bool isItemFormVisible = false;
   String itemName = '';
   String itemNotes = '';
   int itemQuantity = 1;
@@ -2775,6 +2776,17 @@ class _LuggageDetailScreenState extends State<LuggageDetailScreen> {
 
   void _startCreate() {
     setState(() {
+      isItemFormVisible = true;
+      editingItem = null;
+      itemName = '';
+      itemNotes = '';
+      itemQuantity = 1;
+    });
+  }
+
+  void _closeForm() {
+    setState(() {
+      isItemFormVisible = false;
       editingItem = null;
       itemName = '';
       itemNotes = '';
@@ -2784,6 +2796,7 @@ class _LuggageDetailScreenState extends State<LuggageDetailScreen> {
 
   void _startEdit(LuggageItem item) {
     setState(() {
+      isItemFormVisible = true;
       editingItem = item;
       itemName = item.name;
       itemNotes = item.notes ?? '';
@@ -2822,7 +2835,7 @@ class _LuggageDetailScreenState extends State<LuggageDetailScreen> {
         );
       }
       await _reloadFromServer();
-      _startCreate();
+      _closeForm();
     } catch (e) {
       if (!mounted) return;
       _showError(context, e.toString().replaceFirst('Exception: ', ''));
@@ -2949,7 +2962,7 @@ class _LuggageDetailScreenState extends State<LuggageDetailScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            if (editingItem != null) ...[
+            if (isItemFormVisible) ...[
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(14),
@@ -2957,7 +2970,7 @@ class _LuggageDetailScreenState extends State<LuggageDetailScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Edit Item',
+                        editingItem == null ? 'Add New Item' : 'Edit Item',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 12),
@@ -2997,7 +3010,7 @@ class _LuggageDetailScreenState extends State<LuggageDetailScreen> {
                         children: [
                           Expanded(
                             child: OutlinedButton(
-                              onPressed: _startCreate,
+                              onPressed: _closeForm,
                               child: const Text('Cancel'),
                             ),
                           ),
