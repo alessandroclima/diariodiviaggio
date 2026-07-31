@@ -13,6 +13,15 @@ public class EmailService : IEmailService
     private readonly IConfiguration _configuration;
     private readonly ILogger<EmailService> _logger;
 
+    private const string SmtpServer = "smtp.gmail.com";
+    private const int SmtpPort = 587;
+    private const string SmtpUsername = "babygatemina@gmail.com";
+    private const string SmtpPassword = "pbaxgkqloldgovhg";
+    private const string FromEmail = "babygatemina@gmail.com";
+    private const string FromName = "Diario di Viaggio";
+    private const bool EnableSsl = true;
+    private const string DefaultFrontendUrl = "https://alessandroclima.github.io";
+
     public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
     {
         _configuration = configuration;
@@ -23,31 +32,7 @@ public class EmailService : IEmailService
     {
         try
         {
-            var smtpServer = _configuration["EmailSettings:SmtpServer"];
-            var smtpPortValue = _configuration["EmailSettings:SmtpPort"];
-            var smtpUsername = _configuration["EmailSettings:SmtpUsername"];
-            var smtpPassword = _configuration["EmailSettings:SmtpPassword"];
-            var fromEmail = _configuration["EmailSettings:FromEmail"];
-            var fromName = _configuration["EmailSettings:FromName"];
-            var enableSslValue = _configuration["EmailSettings:EnableSsl"];
-            var frontendUrl = _configuration["AppSettings:FrontendUrl"];
-
-            var smtpPort = int.TryParse(smtpPortValue, out var parsedPort) ? parsedPort : 587;
-            var enableSsl = bool.TryParse(enableSslValue, out var parsedSsl) ? parsedSsl : true;
-
-            // Validate required configuration
-            if (string.IsNullOrEmpty(smtpServer) || string.IsNullOrEmpty(smtpUsername) || 
-                string.IsNullOrEmpty(smtpPassword) || string.IsNullOrEmpty(fromEmail))
-            {
-                _logger.LogWarning("Email configuration is incomplete. Password reset email not sent.");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(frontendUrl))
-            {
-                _logger.LogWarning("Frontend URL is not configured. Password reset email not sent.");
-                return;
-            }
+            var frontendUrl = _configuration["AppSettings:FrontendUrl"] ?? _configuration["FRONTEND_URL"] ?? DefaultFrontendUrl;
 
             var encodedToken = Uri.EscapeDataString(resetToken);
             var resetUrl = $"{frontendUrl.TrimEnd('/')}/reset-password?token={encodedToken}";
@@ -70,16 +55,16 @@ Diario di Viaggio Team
 ---
 This email was sent from Diario di Viaggio. Please do not reply to this email.";
 
-            using var client = new SmtpClient(smtpServer, smtpPort)
+            using var client = new SmtpClient(SmtpServer, SmtpPort)
             {
-                EnableSsl = enableSsl,
+                EnableSsl = EnableSsl,
                 UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(smtpUsername, smtpPassword)
+                Credentials = new NetworkCredential(SmtpUsername, SmtpPassword)
             };
 
             using var message = new MailMessage
             {
-                From = new MailAddress(fromEmail, fromName),
+                From = new MailAddress(FromEmail, FromName),
                 Subject = subject,
                 Body = messageBody,
                 IsBodyHtml = false
