@@ -57,6 +57,13 @@ builder.Services.AddScoped<IItineraryService, ItineraryService>();
 
 var app = builder.Build();
 
+// Ensure database schema is aligned with the current model before serving requests.
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {    app.UseSwagger();

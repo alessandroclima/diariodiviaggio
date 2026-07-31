@@ -9,10 +9,12 @@ namespace DiarioDiViaggioApi.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, ILogger<AuthController> logger)
     {
         _authService = authService;
+        _logger = logger;
     }
 
     [HttpPost("register")]
@@ -197,7 +199,7 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Log the exception but don't expose details to client
+            _logger.LogError(ex, "Unexpected error in forgot-password for email {Email}", request.Email);
             return StatusCode(500, new { message = "An error occurred while processing your request." });
         }
     }
@@ -218,7 +220,7 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Log the exception but don't expose details to client
+            _logger.LogError(ex, "Unexpected error in reset-password");
             return StatusCode(500, new { message = "An error occurred while resetting your password." });
         }
     }

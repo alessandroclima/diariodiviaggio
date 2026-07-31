@@ -24,13 +24,16 @@ public class EmailService : IEmailService
         try
         {
             var smtpServer = _configuration["EmailSettings:SmtpServer"];
-            var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"] ?? "587");
+            var smtpPortValue = _configuration["EmailSettings:SmtpPort"];
             var smtpUsername = _configuration["EmailSettings:SmtpUsername"];
             var smtpPassword = _configuration["EmailSettings:SmtpPassword"];
             var fromEmail = _configuration["EmailSettings:FromEmail"];
             var fromName = _configuration["EmailSettings:FromName"];
-            var enableSsl = bool.Parse(_configuration["EmailSettings:EnableSsl"] ?? "true");
+            var enableSslValue = _configuration["EmailSettings:EnableSsl"];
             var frontendUrl = _configuration["AppSettings:FrontendUrl"];
+
+            var smtpPort = int.TryParse(smtpPortValue, out var parsedPort) ? parsedPort : 587;
+            var enableSsl = bool.TryParse(enableSslValue, out var parsedSsl) ? parsedSsl : true;
 
             // Validate required configuration
             if (string.IsNullOrEmpty(smtpServer) || string.IsNullOrEmpty(smtpUsername) || 
@@ -40,7 +43,14 @@ public class EmailService : IEmailService
                 return;
             }
 
-            var resetUrl = $"{frontendUrl}/reset-password?token={resetToken}";
+            if (string.IsNullOrWhiteSpace(frontendUrl))
+            {
+                _logger.LogWarning("Frontend URL is not configured. Password reset email not sent.");
+                return;
+            }
+
+            var encodedToken = Uri.EscapeDataString(resetToken);
+            var resetUrl = $"{frontendUrl.TrimEnd('/')}/reset-password?token={encodedToken}";
 
             var subject = "Reset Your Password - Diario di Viaggio";
             var messageBody = $@"Hello {userName},

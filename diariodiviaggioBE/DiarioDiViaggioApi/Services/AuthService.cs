@@ -15,12 +15,18 @@ public class AuthService : IAuthService
     private readonly ApplicationDbContext _context;
     private readonly IConfiguration _configuration;
     private readonly IEmailService _emailService;
+    private readonly ILogger<AuthService> _logger;
 
-    public AuthService(ApplicationDbContext context, IConfiguration configuration, IEmailService emailService)
+    public AuthService(
+        ApplicationDbContext context,
+        IConfiguration configuration,
+        IEmailService emailService,
+        ILogger<AuthService> logger)
     {
         _context = context;
         _configuration = configuration;
         _emailService = emailService;
+        _logger = logger;
     }
 
     public async Task<(AuthResponseDto response, string refreshToken)> RegisterAsync(RegisterDto registerDto)
@@ -220,15 +226,31 @@ public class AuthService : IAuthService
         _context.PasswordResetTokens.Add(passwordResetToken);
         await _context.SaveChangesAsync();
 
-        // Send reset email
-        await _emailService.SendPasswordResetEmailAsync(user.Email, user.Username, resetToken);
+        // Email delivery should not break the forgot-password API response.
+        try
+        {
+            await _emailService.SendPasswordResetEmailAsync(user.Email, user.Username, resetToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Password reset token created for user {UserId} but email delivery failed",
+                user.Id);
+        }
     }
 
     public async Task ResetPasswordAsync(PasswordResetDto resetDto, string ipAddress)
     {
+        var normalizedToken = (resetDto.Token ?? string.Empty).Trim().Replace(' ', '+');
+        if (string.IsNullOrWhiteSpace(normalizedToken))
+        {
+            throw new InvalidOperationException("Invalid reset token");
+        }
+
         var passwordResetToken = await _context.PasswordResetTokens
             .Include(prt => prt.User)
-            .FirstOrDefaultAsync(prt => prt.Token == resetDto.Token);
+            .FirstOrDefaultAsync(prt => prt.Token == normalizedToken);
 
         if (passwordResetToken == null)
         {
@@ -253,6 +275,10 @@ public class AuthService : IAuthService
 
         // Update user password
         var user = passwordResetToken.User;
+        if (user == null)
+        {
+            throw new InvalidOperationException("Invalid reset token");
+        }
         user.PasswordHash = HashPassword(resetDto.NewPassword);
 
         // Mark token as used
