@@ -20,6 +20,11 @@ public class LuggageResponseDto
     public List<LuggageItemResponseDto> Items { get; set; } = new();
 }
 
+public class ExportLuggageDto
+{
+    public required int TargetTripId { get; set; }
+}
+
 public class CreateLuggageItemDto
 {
     public required string Name { get; set; }

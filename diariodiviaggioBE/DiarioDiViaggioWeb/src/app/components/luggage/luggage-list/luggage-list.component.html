@@ -106,7 +106,7 @@
         </div>
         
         <!-- Progress Bar -->
-        <div class="px-3 pb-2" *ngIf="luggage.items?.length">
+        <div class="px-3 pb-2" *ngIf="luggage.items.length">
           <div class="progress" style="height: 6px;">
             <div 
               class="progress-bar bg-success" 
@@ -120,19 +120,41 @@
           <small class="text-muted">{{ getPackingProgress(luggage.items) | number:'1.0-0' }}% packed</small>
         </div>
         
-                  <!-- Card Actions -->
-          <div class="card-footer bg-transparent border-top-0">
-            <div class="d-flex justify-content-between">
-              <button class="btn btn-outline-primary btn-sm" (click)="navigateToLuggageDetail(luggage)">
-                <i class="bi bi-list-check me-1"></i>
-                Manage Items
-              </button>
-              <button class="btn btn-outline-danger btn-sm" (click)="deleteLuggage(luggage)">
-                <i class="bi bi-trash me-1"></i>
-                Delete
-              </button>
-            </div>
+        <!-- Card Actions -->
+        <div class="card-footer bg-transparent border-top-0">
+          <div class="d-flex justify-content-between mb-2">
+            <button class="btn btn-outline-primary btn-sm" (click)="navigateToLuggageDetail(luggage)">
+              <i class="bi bi-list-check me-1"></i>
+              Manage Items
+            </button>
+            <button class="btn btn-outline-danger btn-sm" (click)="deleteLuggage(luggage)">
+              <i class="bi bi-trash me-1"></i>
+              Delete
+            </button>
           </div>
+
+          <div *ngIf="availableTrips.length > 0" class="d-flex gap-2">
+            <select
+              class="form-select form-select-sm"
+              [(ngModel)]="selectedExportTripIds[luggage.id]"
+              [ngModelOptions]="{ standalone: true }">
+              <option *ngFor="let trip of availableTrips" [ngValue]="trip.id">
+                {{ trip.title }}
+              </option>
+            </select>
+            <button
+              class="btn btn-outline-success btn-sm"
+              [disabled]="exportingLuggageId === luggage.id"
+              (click)="exportLuggage(luggage)">
+              <span
+                *ngIf="exportingLuggageId === luggage.id"
+                class="spinner-border spinner-border-sm me-1"
+                role="status"></span>
+              <i *ngIf="exportingLuggageId !== luggage.id" class="bi bi-box-arrow-up-right me-1"></i>
+              Export
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

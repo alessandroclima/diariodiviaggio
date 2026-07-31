@@ -4,6 +4,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Luggage, LuggageService, CreateLuggageRequest } from '../../../services/luggage.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { NotificationService } from '../../../services/notification.service';
+import { Trip, TripService } from '../../../services/trip.service';
 
 @Component({
   selector: 'app-luggage-list',
@@ -14,6 +15,9 @@ export class LuggageListComponent implements OnInit {
   @Input() tripId!: number;
   
   luggages: Luggage[] = [];
+  availableTrips: Trip[] = [];
+  selectedExportTripIds: Record<number, number> = {};
+  exportingLuggageId: number | null = null;
   loading = true;
   error = false;
   showAddForm = false;
@@ -26,12 +30,27 @@ export class LuggageListComponent implements OnInit {
   constructor(
     private router: Router,
     private luggageService: LuggageService,
+    private tripService: TripService,
     private modal: NgbModal,
     private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
+    this.loadTrips();
     this.loadLuggages();
+  }
+
+  loadTrips(): void {
+    this.tripService.getUserTrips().subscribe({
+      next: (trips) => {
+        this.availableTrips = trips.filter(t => t.id !== this.tripId);
+        this.syncSelectedExportTargets();
+      },
+      error: () => {
+        this.availableTrips = [];
+        this.selectedExportTripIds = {};
+      }
+    });
   }
 
   loadLuggages(): void {
@@ -41,6 +60,7 @@ export class LuggageListComponent implements OnInit {
     this.luggageService.getTripLuggages(this.tripId).subscribe({
       next: (luggages) => {
         this.luggages = luggages;
+        this.syncSelectedExportTargets();
         this.loading = false;
       },
       error: (err) => {
@@ -48,6 +68,44 @@ export class LuggageListComponent implements OnInit {
         this.loading = false;
         this.error = true;
         this.notificationService.showError('Failed to load luggage lists');
+      }
+    });
+  }
+
+  private syncSelectedExportTargets(): void {
+    if (this.availableTrips.length === 0) {
+      this.selectedExportTripIds = {};
+      return;
+    }
+
+    const defaultTripId = this.availableTrips[0].id;
+    const nextSelections: Record<number, number> = {};
+
+    for (const luggage of this.luggages) {
+      const selected = this.selectedExportTripIds[luggage.id];
+      const existsInOptions = this.availableTrips.some(t => t.id === selected);
+      nextSelections[luggage.id] = existsInOptions ? selected : defaultTripId;
+    }
+
+    this.selectedExportTripIds = nextSelections;
+  }
+
+  exportLuggage(luggage: Luggage): void {
+    const targetTripId = this.selectedExportTripIds[luggage.id];
+    if (!targetTripId) {
+      this.notificationService.showError('Select a destination trip before exporting');
+      return;
+    }
+
+    this.exportingLuggageId = luggage.id;
+    this.luggageService.exportLuggage(luggage.id, { targetTripId }).subscribe({
+      next: () => {
+        this.notificationService.showSuccess('Luggage exported successfully');
+        this.exportingLuggageId = null;
+      },
+      error: (err) => {
+        this.notificationService.showError(err.error?.message || 'Failed to export luggage');
+        this.exportingLuggageId = null;
       }
     });
   }

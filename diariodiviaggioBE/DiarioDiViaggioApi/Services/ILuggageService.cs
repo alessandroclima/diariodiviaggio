@@ -8,6 +8,7 @@ public interface ILuggageService
     Task<LuggageResponseDto> UpdateLuggageAsync(int luggageId, int userId, UpdateLuggageDto updateDto);
     Task<LuggageResponseDto> GetLuggageByIdAsync(int luggageId, int userId);
     Task<List<LuggageResponseDto>> GetTripLuggagesAsync(int tripId, int userId);
+    Task<LuggageResponseDto> ExportLuggageAsync(int luggageId, int targetTripId, int userId);
     Task DeleteLuggageAsync(int luggageId, int userId);
     
     // Luggage Item operations

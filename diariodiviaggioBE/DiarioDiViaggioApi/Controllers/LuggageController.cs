@@ -103,6 +103,21 @@ public class LuggageController : ControllerBase
         }
     }
 
+    [HttpPost("{id}/export")]
+    public async Task<ActionResult<LuggageResponseDto>> ExportLuggage(int id, ExportLuggageDto exportDto)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var exported = await _luggageService.ExportLuggageAsync(id, exportDto.TargetTripId, userId);
+            return Ok(exported);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
     [HttpPost("{luggageId}/items")]
     public async Task<ActionResult<LuggageItemResponseDto>> AddLuggageItem(int luggageId, CreateLuggageItemDto createItemDto)
     {

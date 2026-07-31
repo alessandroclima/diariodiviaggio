@@ -631,6 +631,23 @@ class ApiClient {
     }
   }
 
+  Future<Luggage> exportLuggage(
+    String token,
+    int luggageId,
+    int targetTripId,
+  ) async {
+    try {
+      final res = await _dio.post<Map<String, dynamic>>(
+        '/api/luggage/$luggageId/export',
+        options: _auth(token),
+        data: {'targetTripId': targetTripId},
+      );
+      return Luggage.fromJson(res.data ?? {});
+    } catch (e) {
+      throw Exception(_errorToMessage(e));
+    }
+  }
+
   Future<LuggageItem> createLuggageItem(
     String token,
     int luggageId,
@@ -2571,6 +2588,79 @@ class _LuggageScreenState extends State<LuggageScreen> {
     await _reload();
   }
 
+  Future<void> _exportLuggage(Luggage luggage) async {
+    final session = context.read<SessionStore>();
+    final trips = await session._apiClient.getTrips(session.token!);
+    if (!mounted) {
+      return;
+    }
+    final destinationTrips = trips.where((trip) => trip.id != widget.tripId).toList();
+
+    if (destinationTrips.isEmpty) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Create another trip before exporting luggage.')),
+      );
+      return;
+    }
+
+    int selectedTripId = destinationTrips.first.id;
+    final targetTripId = await showDialog<int>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Export luggage'),
+          content: DropdownButtonFormField<int>(
+            initialValue: selectedTripId,
+            decoration: const InputDecoration(
+              labelText: 'Destination trip',
+              border: OutlineInputBorder(),
+            ),
+            items: destinationTrips
+                .map(
+                  (trip) => DropdownMenuItem<int>(
+                    value: trip.id,
+                    child: Text(trip.title),
+                  ),
+                )
+                .toList(),
+            onChanged: (value) {
+              if (value == null) {
+                return;
+              }
+              setDialogState(() => selectedTripId = value);
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, selectedTripId),
+              child: const Text('Export'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (targetTripId == null) {
+      return;
+    }
+
+    await session._apiClient.exportLuggage(session.token!, luggage.id, targetTripId);
+
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Luggage exported successfully.')));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -2675,6 +2765,14 @@ class _LuggageScreenState extends State<LuggageScreen> {
                                 ),
                                 icon: const Icon(Icons.list_alt),
                                 label: const Text('Manage Items'),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () => _exportLuggage(luggage),
+                                icon: const Icon(Icons.outbox_outlined),
+                                label: const Text('Export'),
                               ),
                             ),
                           ],

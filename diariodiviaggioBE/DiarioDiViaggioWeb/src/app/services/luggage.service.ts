@@ -28,6 +28,10 @@ export interface UpdateLuggageRequest {
   description?: string;
 }
 
+export interface ExportLuggageRequest {
+  targetTripId: number;
+}
+
 export interface CreateLuggageItemRequest {
   name: string;
   notes?: string;
@@ -67,6 +71,10 @@ export class LuggageService {
 
   deleteLuggage(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  exportLuggage(id: number, request: ExportLuggageRequest): Observable<Luggage> {
+    return this.http.post<Luggage>(`${this.apiUrl}/${id}/export`, request);
   }
 
   // Luggage Item operations

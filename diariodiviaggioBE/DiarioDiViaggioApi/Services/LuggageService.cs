@@ -89,6 +89,47 @@ public class LuggageService : ILuggageService
         return luggageDtos;
     }
 
+    public async Task<LuggageResponseDto> ExportLuggageAsync(int luggageId, int targetTripId, int userId)
+    {
+        var sourceLuggage = await _context.Luggages
+            .Include(l => l.Items)
+            .FirstOrDefaultAsync(l => l.Id == luggageId);
+
+        if (sourceLuggage == null || !await HasAccessToTrip(sourceLuggage.TripId, userId))
+        {
+            throw new InvalidOperationException("Luggage not found or you don't have access to it");
+        }
+
+        if (!await HasAccessToTrip(targetTripId, userId))
+        {
+            throw new InvalidOperationException("Target trip not found or you don't have access to it");
+        }
+
+        if (targetTripId == sourceLuggage.TripId)
+        {
+            throw new InvalidOperationException("Please select a different target trip");
+        }
+
+        var exportedLuggage = new Luggage
+        {
+            Name = sourceLuggage.Name,
+            Description = sourceLuggage.Description,
+            TripId = targetTripId,
+            Items = sourceLuggage.Items.Select(item => new LuggageItem
+            {
+                Name = item.Name,
+                Notes = item.Notes,
+                Quantity = item.Quantity,
+                IsPacked = false
+            }).ToList()
+        };
+
+        _context.Luggages.Add(exportedLuggage);
+        await _context.SaveChangesAsync();
+
+        return await GetLuggageResponseDto(exportedLuggage);
+    }
+
     public async Task DeleteLuggageAsync(int luggageId, int userId)
     {
         var luggage = await _context.Luggages
