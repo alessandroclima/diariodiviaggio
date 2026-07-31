@@ -1,14 +1,18 @@
 <div class="container-fluid py-4">
   <!-- Header -->
   <div class="d-flex justify-content-between align-items-center mb-4">
-     <button class="btn btn-outline-secondary me-3" [routerLink]="['/trips', tripId]">
+    <button
+      class="btn btn-outline-secondary me-3"
+      [routerLink]="['/trips', tripId]"
+    >
       <i class="bi bi-arrow-left"></i>
     </button>
     <h2 class="mb-0">Luggage Lists</h2>
-    <button 
-      class="btn btn-primary" 
-      (click)="toggleAddForm()" 
-      *ngIf="!showAddForm">
+    <button
+      class="btn btn-primary"
+      (click)="toggleAddForm()"
+      *ngIf="!showAddForm"
+    >
       <i class="bi bi-plus-circle me-2"></i>
       Add Luggage List
     </button>
@@ -23,30 +27,36 @@
       <div class="card-body">
         <div class="mb-3">
           <label for="luggageName" class="form-label">Name *</label>
-          <input 
-            type="text" 
-            class="form-control" 
+          <input
+            type="text"
+            class="form-control"
             id="luggageName"
-            [(ngModel)]="newLuggage.name" 
-            placeholder="e.g. Summer Vacation Luggage" 
-            required>
+            [(ngModel)]="newLuggage.name"
+            placeholder="e.g. Summer Vacation Luggage"
+            required
+          />
         </div>
-        
+
         <div class="mb-3">
           <label for="luggageDescription" class="form-label">Description</label>
-          <textarea 
-            class="form-control" 
+          <textarea
+            class="form-control"
             id="luggageDescription"
-            [(ngModel)]="newLuggage.description" 
-            placeholder="Add some details about this luggage list" 
-            rows="3">
+            [(ngModel)]="newLuggage.description"
+            placeholder="Add some details about this luggage list"
+            rows="3"
+          >
           </textarea>
         </div>
       </div>
       <div class="card-footer bg-transparent">
         <div class="d-flex justify-content-end gap-2">
-          <button class="btn btn-outline-secondary" (click)="toggleAddForm()">Cancel</button>
-          <button class="btn btn-primary" (click)="createLuggage()">Create</button>
+          <button class="btn btn-outline-secondary" (click)="toggleAddForm()">
+            Cancel
+          </button>
+          <button class="btn btn-primary" (click)="createLuggage()">
+            Create
+          </button>
         </div>
       </div>
     </div>
@@ -59,7 +69,7 @@
     </div>
     <p class="text-muted">Loading luggage lists...</p>
   </div>
-  
+
   <!-- Error State -->
   <div class="alert alert-danger text-center" *ngIf="error">
     <i class="bi bi-exclamation-triangle fs-1 mb-3 d-block"></i>
@@ -71,9 +81,14 @@
   </div>
 
   <!-- Empty State -->
-  <div class="text-center py-5" *ngIf="!loading && !error && luggages.length === 0">
+  <div
+    class="text-center py-5"
+    *ngIf="!loading && !error && luggages.length === 0"
+  >
     <i class="bi bi-suitcase fs-1 text-muted mb-3 d-block"></i>
-    <p class="text-muted mb-3">No luggage lists yet. Create one to start packing for your trip!</p>
+    <p class="text-muted mb-3">
+      No luggage lists yet. Create one to start packing for your trip!
+    </p>
     <button class="btn btn-primary" (click)="toggleAddForm()">
       <i class="bi bi-plus-circle me-2"></i>
       Add Luggage List
@@ -87,47 +102,61 @@
         <!-- Card Header -->
         <div class="card-header bg-transparent border-bottom-0 pb-0">
           <div class="d-flex align-items-center">
-            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" 
-                 style="width: 40px; height: 40px;">
+            <div
+              class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3"
+              style="width: 40px; height: 40px"
+            >
               <i class="bi bi-suitcase"></i>
             </div>
             <div class="flex-grow-1">
               <h6 class="card-title mb-1">{{ luggage.name }}</h6>
               <small class="text-muted" *ngIf="luggage.items">
-                {{ luggage.items.length }} items ({{ getPackedItemsCount(luggage.items) }} packed)
+                {{ luggage.items.length }} items ({{
+                  getPackedItemsCount(luggage.items)
+                }}
+                packed)
               </small>
             </div>
           </div>
         </div>
-        
+
         <!-- Card Body -->
         <div class="card-body" *ngIf="luggage.description">
           <p class="card-text">{{ luggage.description }}</p>
         </div>
-        
+
         <!-- Progress Bar -->
         <div class="px-3 pb-2" *ngIf="luggage.items.length">
-          <div class="progress" style="height: 6px;">
-            <div 
-              class="progress-bar bg-success" 
-              role="progressbar" 
+          <div class="progress" style="height: 6px">
+            <div
+              class="progress-bar bg-success"
+              role="progressbar"
               [style.width.%]="getPackingProgress(luggage.items)"
               [attr.aria-valuenow]="getPackingProgress(luggage.items)"
-              aria-valuemin="0" 
-              aria-valuemax="100">
-            </div>
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
           </div>
-          <small class="text-muted">{{ getPackingProgress(luggage.items) | number:'1.0-0' }}% packed</small>
+          <small class="text-muted"
+            >{{ getPackingProgress(luggage.items) | number: "1.0-0" }}%
+            packed</small
+          >
         </div>
-        
+
         <!-- Card Actions -->
         <div class="card-footer bg-transparent border-top-0">
           <div class="d-flex justify-content-between mb-2">
-            <button class="btn btn-outline-primary btn-sm" (click)="navigateToLuggageDetail(luggage)">
+            <button
+              class="btn btn-outline-primary btn-sm"
+              (click)="navigateToLuggageDetail(luggage)"
+            >
               <i class="bi bi-list-check me-1"></i>
               Manage Items
             </button>
-            <button class="btn btn-outline-danger btn-sm" (click)="deleteLuggage(luggage)">
+            <button
+              class="btn btn-outline-danger btn-sm"
+              (click)="deleteLuggage(luggage)"
+            >
               <i class="bi bi-trash me-1"></i>
               Delete
             </button>
@@ -137,7 +166,8 @@
             <select
               class="form-select form-select-sm"
               [(ngModel)]="selectedExportTripIds[luggage.id]"
-              [ngModelOptions]="{ standalone: true }">
+              [ngModelOptions]="{ standalone: true }"
+            >
               <option *ngFor="let trip of availableTrips" [ngValue]="trip.id">
                 {{ trip.title }}
               </option>
@@ -145,12 +175,17 @@
             <button
               class="btn btn-outline-success btn-sm"
               [disabled]="exportingLuggageId === luggage.id"
-              (click)="exportLuggage(luggage)">
+              (click)="exportLuggage(luggage)"
+            >
               <span
                 *ngIf="exportingLuggageId === luggage.id"
                 class="spinner-border spinner-border-sm me-1"
-                role="status"></span>
-              <i *ngIf="exportingLuggageId !== luggage.id" class="bi bi-box-arrow-up-right me-1"></i>
+                role="status"
+              ></span>
+              <i
+                *ngIf="exportingLuggageId !== luggage.id"
+                class="bi bi-box-arrow-up-right me-1"
+              ></i>
               Export
             </button>
           </div>

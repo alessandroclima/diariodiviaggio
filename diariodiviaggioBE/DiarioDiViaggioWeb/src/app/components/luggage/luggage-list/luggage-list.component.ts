@@ -1,7 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Luggage, LuggageService, CreateLuggageRequest } from '../../../services/luggage.service';
+import {
+  Luggage,
+  LuggageService,
+  CreateLuggageRequest,
+} from '../../../services/luggage.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { NotificationService } from '../../../services/notification.service';
 import { Trip, TripService } from '../../../services/trip.service';
@@ -9,11 +13,11 @@ import { Trip, TripService } from '../../../services/trip.service';
 @Component({
   selector: 'app-luggage-list',
   templateUrl: './luggage-list.component.html',
-  styleUrls: ['./luggage-list.component.scss']
+  styleUrls: ['./luggage-list.component.scss'],
 })
 export class LuggageListComponent implements OnInit {
   @Input() tripId!: number;
-  
+
   luggages: Luggage[] = [];
   availableTrips: Trip[] = [];
   selectedExportTripIds: Record<number, number> = {};
@@ -21,10 +25,10 @@ export class LuggageListComponent implements OnInit {
   loading = true;
   error = false;
   showAddForm = false;
-  
+
   newLuggage: CreateLuggageRequest = {
     name: '',
-    description: ''
+    description: '',
   };
 
   constructor(
@@ -32,8 +36,8 @@ export class LuggageListComponent implements OnInit {
     private luggageService: LuggageService,
     private tripService: TripService,
     private modal: NgbModal,
-    private notificationService: NotificationService
-  ) { }
+    private notificationService: NotificationService,
+  ) {}
 
   ngOnInit(): void {
     this.loadTrips();
@@ -43,20 +47,20 @@ export class LuggageListComponent implements OnInit {
   loadTrips(): void {
     this.tripService.getUserTrips().subscribe({
       next: (trips) => {
-        this.availableTrips = trips.filter(t => t.id !== this.tripId);
+        this.availableTrips = trips.filter((t) => t.id !== this.tripId);
         this.syncSelectedExportTargets();
       },
       error: () => {
         this.availableTrips = [];
         this.selectedExportTripIds = {};
-      }
+      },
     });
   }
 
   loadLuggages(): void {
     this.loading = true;
     this.error = false;
-    
+
     this.luggageService.getTripLuggages(this.tripId).subscribe({
       next: (luggages) => {
         this.luggages = luggages;
@@ -68,7 +72,7 @@ export class LuggageListComponent implements OnInit {
         this.loading = false;
         this.error = true;
         this.notificationService.showError('Failed to load luggage lists');
-      }
+      },
     });
   }
 
@@ -83,7 +87,9 @@ export class LuggageListComponent implements OnInit {
 
     for (const luggage of this.luggages) {
       const selected = this.selectedExportTripIds[luggage.id];
-      const existsInOptions = this.availableTrips.some(t => t.id === selected);
+      const existsInOptions = this.availableTrips.some(
+        (t) => t.id === selected,
+      );
       nextSelections[luggage.id] = existsInOptions ? selected : defaultTripId;
     }
 
@@ -93,7 +99,9 @@ export class LuggageListComponent implements OnInit {
   exportLuggage(luggage: Luggage): void {
     const targetTripId = this.selectedExportTripIds[luggage.id];
     if (!targetTripId) {
-      this.notificationService.showError('Select a destination trip before exporting');
+      this.notificationService.showError(
+        'Select a destination trip before exporting',
+      );
       return;
     }
 
@@ -104,9 +112,11 @@ export class LuggageListComponent implements OnInit {
         this.exportingLuggageId = null;
       },
       error: (err) => {
-        this.notificationService.showError(err.error?.message || 'Failed to export luggage');
+        this.notificationService.showError(
+          err.error?.message || 'Failed to export luggage',
+        );
         this.exportingLuggageId = null;
-      }
+      },
     });
   }
 
@@ -116,14 +126,16 @@ export class LuggageListComponent implements OnInit {
       // Reset form
       this.newLuggage = {
         name: '',
-        description: ''
+        description: '',
       };
     }
   }
 
   createLuggage(): void {
     if (!this.newLuggage.name.trim()) {
-      this.notificationService.showError('Please provide a name for the luggage list');
+      this.notificationService.showError(
+        'Please provide a name for the luggage list',
+      );
       return;
     }
 
@@ -131,12 +143,14 @@ export class LuggageListComponent implements OnInit {
       next: (luggage) => {
         this.luggages.push(luggage);
         this.showAddForm = false;
-        this.notificationService.showSuccess('Luggage list created successfully');
+        this.notificationService.showSuccess(
+          'Luggage list created successfully',
+        );
       },
       error: (err) => {
         console.error('Error creating luggage:', err);
         this.notificationService.showError('Failed to create luggage list');
-      }
+      },
     });
   }
 
@@ -146,26 +160,32 @@ export class LuggageListComponent implements OnInit {
     modalRef.componentInstance.message = `Are you sure you want to delete "${luggage.name}"?`;
     modalRef.componentInstance.confirmButtonText = 'Delete';
 
-    modalRef.result.then((result: boolean) => {
-      if (result) {
-        this.luggageService.deleteLuggage(luggage.id).subscribe({
-          next: () => {
-            this.luggages = this.luggages.filter(l => l.id !== luggage.id);
-            this.notificationService.showSuccess('Luggage list deleted successfully');
-          },
-          error: (err) => {
-            console.error('Error deleting luggage:', err);
-            this.notificationService.showError('Failed to delete luggage list');
-          }
-        });
-      }
-    }).catch(() => {
-      // Modal dismissed
-    });
+    modalRef.result
+      .then((result: boolean) => {
+        if (result) {
+          this.luggageService.deleteLuggage(luggage.id).subscribe({
+            next: () => {
+              this.luggages = this.luggages.filter((l) => l.id !== luggage.id);
+              this.notificationService.showSuccess(
+                'Luggage list deleted successfully',
+              );
+            },
+            error: (err) => {
+              console.error('Error deleting luggage:', err);
+              this.notificationService.showError(
+                'Failed to delete luggage list',
+              );
+            },
+          });
+        }
+      })
+      .catch(() => {
+        // Modal dismissed
+      });
   }
 
   getPackedItemsCount(items: any[]): number {
-    return items.filter(item => item.isPacked).length;
+    return items.filter((item) => item.isPacked).length;
   }
 
   getPackingProgress(items: any[]): number {

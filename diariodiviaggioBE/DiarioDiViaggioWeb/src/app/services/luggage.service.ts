@@ -46,18 +46,24 @@ export interface UpdateLuggageItemRequest {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LuggageService {
   private apiUrl = `${environment.apiUrl}/api/luggage`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  createLuggage(tripId: number, request: CreateLuggageRequest): Observable<Luggage> {
+  createLuggage(
+    tripId: number,
+    request: CreateLuggageRequest,
+  ): Observable<Luggage> {
     return this.http.post<Luggage>(`${this.apiUrl}/trip/${tripId}`, request);
   }
 
-  updateLuggage(id: number, request: UpdateLuggageRequest): Observable<Luggage> {
+  updateLuggage(
+    id: number,
+    request: UpdateLuggageRequest,
+  ): Observable<Luggage> {
     return this.http.put<Luggage>(`${this.apiUrl}/${id}`, request);
   }
 
@@ -73,17 +79,32 @@ export class LuggageService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  exportLuggage(id: number, request: ExportLuggageRequest): Observable<Luggage> {
+  exportLuggage(
+    id: number,
+    request: ExportLuggageRequest,
+  ): Observable<Luggage> {
     return this.http.post<Luggage>(`${this.apiUrl}/${id}/export`, request);
   }
 
   // Luggage Item operations
-  addLuggageItem(luggageId: number, request: CreateLuggageItemRequest): Observable<LuggageItem> {
-    return this.http.post<LuggageItem>(`${this.apiUrl}/${luggageId}/items`, request);
+  addLuggageItem(
+    luggageId: number,
+    request: CreateLuggageItemRequest,
+  ): Observable<LuggageItem> {
+    return this.http.post<LuggageItem>(
+      `${this.apiUrl}/${luggageId}/items`,
+      request,
+    );
   }
 
-  updateLuggageItem(itemId: number, request: UpdateLuggageItemRequest): Observable<LuggageItem> {
-    return this.http.put<LuggageItem>(`${this.apiUrl}/items/${itemId}`, request);
+  updateLuggageItem(
+    itemId: number,
+    request: UpdateLuggageItemRequest,
+  ): Observable<LuggageItem> {
+    return this.http.put<LuggageItem>(
+      `${this.apiUrl}/items/${itemId}`,
+      request,
+    );
   }
 
   getLuggageItem(itemId: number): Observable<LuggageItem> {

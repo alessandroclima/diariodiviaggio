@@ -2594,14 +2594,18 @@ class _LuggageScreenState extends State<LuggageScreen> {
     if (!mounted) {
       return;
     }
-    final destinationTrips = trips.where((trip) => trip.id != widget.tripId).toList();
+    final destinationTrips = trips
+        .where((trip) => trip.id != widget.tripId)
+        .toList();
 
     if (destinationTrips.isEmpty) {
       if (!mounted) {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Create another trip before exporting luggage.')),
+        const SnackBar(
+          content: Text('Create another trip before exporting luggage.'),
+        ),
       );
       return;
     }
@@ -2651,14 +2655,18 @@ class _LuggageScreenState extends State<LuggageScreen> {
       return;
     }
 
-    await session._apiClient.exportLuggage(session.token!, luggage.id, targetTripId);
+    await session._apiClient.exportLuggage(
+      session.token!,
+      luggage.id,
+      targetTripId,
+    );
 
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Luggage exported successfully.')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Luggage exported successfully.')),
+    );
   }
 
   @override
