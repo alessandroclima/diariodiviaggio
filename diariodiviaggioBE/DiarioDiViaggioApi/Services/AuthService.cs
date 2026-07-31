@@ -194,7 +194,14 @@ public class AuthService : IAuthService
 
     public async Task RequestPasswordResetAsync(PasswordResetRequestDto request, string ipAddress)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        var normalizedEmail = (request.Email ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(normalizedEmail))
+        {
+            return;
+        }
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => EF.Functions.ILike(u.Email, normalizedEmail));
         if (user == null)
         {
             // Don't reveal if email exists or not for security

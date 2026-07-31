@@ -16,7 +16,7 @@ public class EmailService : IEmailService
     private const string SmtpServer = "smtp.gmail.com";
     private const int SmtpPort = 587;
     private const string SmtpUsername = "babygatemina@gmail.com";
-    private const string SmtpPassword = "pbaxgkqloldgovhg";
+    private const string SmtpPassword = "mrtyoesqfaqqhrur";
     private const string FromEmail = "babygatemina@gmail.com";
     private const string FromName = "Diario di Viaggio";
     private const bool EnableSsl = true;
