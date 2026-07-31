@@ -20,7 +20,7 @@ public class EmailService : IEmailService
     private const string FromEmail = "babygatemina@gmail.com";
     private const string FromName = "Diario di Viaggio";
     private const bool EnableSsl = true;
-    private const string DefaultFrontendUrl = "https://alessandroclima.github.io";
+    private const string FrontendBaseUrl = "https://alessandroclima.github.io/diariodiviaggio";
 
     public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
     {
@@ -32,10 +32,9 @@ public class EmailService : IEmailService
     {
         try
         {
-            var frontendUrl = _configuration["AppSettings:FrontendUrl"] ?? _configuration["FRONTEND_URL"] ?? DefaultFrontendUrl;
-
             var encodedToken = Uri.EscapeDataString(resetToken);
-            var resetUrl = $"{frontendUrl.TrimEnd('/')}/reset-password?token={encodedToken}";
+            // GitHub Pages SPA-safe URL: bypasses direct deep-link 404 and restores route via index.html script.
+            var resetUrl = $"{FrontendBaseUrl.TrimEnd('/')}/?/reset-password&token={encodedToken}";
 
             var subject = "Reset Your Password - Diario di Viaggio";
             var messageBody = $@"Hello {userName},
