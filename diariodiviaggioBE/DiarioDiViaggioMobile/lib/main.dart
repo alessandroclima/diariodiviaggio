@@ -2765,12 +2765,17 @@ class _LuggageScreenState extends State<LuggageScreen> {
                           children: [
                             Expanded(
                               child: OutlinedButton.icon(
-                                onPressed: () => Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        LuggageDetailScreen(luggage: luggage),
-                                  ),
-                                ),
+                                onPressed: () async {
+                                  await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => LuggageDetailScreen(
+                                        tripId: widget.tripId,
+                                        luggage: luggage,
+                                      ),
+                                    ),
+                                  );
+                                  await _reload();
+                                },
                                 icon: const Icon(Icons.list_alt),
                                 label: const Text('Manage Items'),
                               ),
@@ -2833,8 +2838,13 @@ class _LuggageScreenState extends State<LuggageScreen> {
 }
 
 class LuggageDetailScreen extends StatefulWidget {
-  const LuggageDetailScreen({super.key, required this.luggage});
+  const LuggageDetailScreen({
+    super.key,
+    required this.tripId,
+    required this.luggage,
+  });
 
+  final int tripId;
   final Luggage luggage;
 
   @override
@@ -2855,6 +2865,12 @@ class _LuggageDetailScreenState extends State<LuggageDetailScreen> {
   void initState() {
     super.initState();
     luggage = widget.luggage;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _reloadFromServer();
+    });
   }
 
   int get packedCount => luggage.items.where((e) => e.isPacked).length;
@@ -2868,7 +2884,7 @@ class _LuggageDetailScreenState extends State<LuggageDetailScreen> {
       final session = context.read<SessionStore>();
       final luggages = await session._apiClient.getLuggages(
         session.token!,
-        luggage.id,
+        widget.tripId,
       );
       final refreshed = luggages.firstWhere(
         (e) => e.id == luggage.id,
@@ -2951,18 +2967,59 @@ class _LuggageDetailScreenState extends State<LuggageDetailScreen> {
   }
 
   Future<void> _togglePacked(LuggageItem item, bool packed) async {
+    if (item.isPacked == packed) {
+      return;
+    }
+
+    final previousPacked = item.isPacked;
+    _setItemPacked(item.id, packed);
+
     final session = context.read<SessionStore>();
-    await session._apiClient.updateLuggageItem(
-      session.token!,
-      item.id,
-      LuggageItemUpsert(
-        name: item.name,
-        quantity: item.quantity,
-        notes: item.notes,
-        isPacked: packed,
-      ),
-    );
-    await _reloadFromServer();
+    try {
+      await session._apiClient.updateLuggageItem(
+        session.token!,
+        item.id,
+        LuggageItemUpsert(
+          name: item.name,
+          quantity: item.quantity,
+          notes: item.notes,
+          isPacked: packed,
+        ),
+      );
+    } catch (e) {
+      _setItemPacked(item.id, previousPacked);
+      if (!mounted) {
+        return;
+      }
+      _showError(context, e.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  void _setItemPacked(int itemId, bool packed) {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      luggage = Luggage(
+        id: luggage.id,
+        name: luggage.name,
+        description: luggage.description,
+        items: luggage.items
+            .map(
+              (current) => current.id == itemId
+                  ? LuggageItem(
+                      id: current.id,
+                      name: current.name,
+                      notes: current.notes,
+                      quantity: current.quantity,
+                      isPacked: packed,
+                    )
+                  : current,
+            )
+            .toList(),
+      );
+    });
   }
 
   Future<void> _deleteItem(LuggageItem item) async {
@@ -3145,7 +3202,9 @@ class _LuggageDetailScreenState extends State<LuggageDetailScreen> {
                 (item) => Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: item.isPacked
+                        ? const Color(0xFFE7F7EE)
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: Colors.grey.shade300),
                     boxShadow: [
@@ -3205,26 +3264,6 @@ class _LuggageDetailScreenState extends State<LuggageDetailScreen> {
                                         ),
                                       ),
                                     ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 3,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: item.isPacked
-                                          ? const Color(0xFF1E9E62)
-                                          : Colors.grey.shade400,
-                                      borderRadius: BorderRadius.circular(999),
-                                    ),
-                                    child: Text(
-                                      item.isPacked ? 'Packed' : 'Open',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
                                 ],
                               ),
                               if (item.notes != null &&
